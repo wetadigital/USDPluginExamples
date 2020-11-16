@@ -1,0 +1,6 @@
+BasedOnStyle: Mozilla
+AccessModifierOffset: -4
+IndentWidth: 4
+ContinuationIndentWidth: 4
+IndentPPDirectives: AfterHash
+SortIncludes: false

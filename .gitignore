@@ -1,0 +1,18 @@
+# A common directory to host intermediate build files.
+build/
+
+# VIM swap files.
+*.sw[pon]
+
+# Backup files. 
+.bak
+
+# C++ object files.
+*.o
+
+# Python cache files.
+*.pyc
+
+# Local convenience scripts.
+build.sh
+runtime.sh

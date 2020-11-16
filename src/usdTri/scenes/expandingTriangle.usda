@@ -1,0 +1,14 @@
+#usda 1.0
+(
+    defaultPrim = "triangle"
+    endTimeCode = 10
+    startTimeCode = 1
+)
+
+def Triangle "triangle"
+{
+    double sideLength.timeSamples = {
+        1: 1,
+        10: 10,
+    }
+}
