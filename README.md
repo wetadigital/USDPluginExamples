@@ -34,7 +34,7 @@ The following dependencies are required:
 - C++ compiler
 - [CMake](https://cmake.org/documentation/) (3.12 or greater)
 - [USD](https://github.com/pixaranimationstudios/USD)
-- [Boost](https://boost.org) (USD) and [Intel TBB](https://www.threadingbuildingblocks.org/) (USD dependencies)
+- [Boost](https://boost.org) and [Intel TBB](https://www.threadingbuildingblocks.org/) (USD dependencies)
 
 [Python](https://www.python.org/) may also be required, depending on python support in the USD installation.
 
