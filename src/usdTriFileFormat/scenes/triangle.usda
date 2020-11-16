@@ -1,0 +1,9 @@
+#usda 1.0
+
+def "triangle" (
+    Usd_Triangle_SideLength = 1
+    payload = @./empty.triangle@
+)
+{
+}
+

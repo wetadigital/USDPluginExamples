@@ -1,0 +1,81 @@
+name: Build and test
+
+# Run the jobs for pushes and pull requests targetting main branch.
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # ASWF docker images based build
+  aswf-build:
+    strategy:
+      matrix:
+        vfx:
+          - 2020
+          - 2021
+        include:
+          - vfx: 2020
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: 'ON'
+          - vfx: 2021
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: 'ON'
+    runs-on: ubuntu-18.04
+    container:
+        image: aswf/ci-vfxall:${{ matrix.vfx }}
+    steps:
+      - uses: actions/checkout@v2
+      - name: Create build directories
+        run: |
+          mkdir _build
+          mkdir _install
+      - name: Configure
+        run: |
+          cmake -DUSD_ROOT="/usr/local" \
+                -DTBB_ROOT="/usr/local" \
+                -DBOOST_ROOT="/usr/local" \
+                -DUSE_PYTHON_3=${{ matrix.USE_PYTHON_3 }} \
+                -DBUILD_TESTING=${{ matrix.buildTests }} \
+                -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" \
+                -DCMAKE_INSTALL_PREFIX=_install \
+                ..
+        working-directory: _build
+      - name: Build
+        run: |
+          cmake --build . \
+                --verbose \
+                --target install \
+                --config ${{ matrix.buildType }}
+        working-directory: _build
+      - name: Test
+        run: ctest -VV --output-on-failure -C ${{ matrix.buildType }}
+        working-directory: _build
+
+  # Run automated code formatting checks.
+  code-formatting-check:
+    runs-on: ubuntu-18.04 
+    steps:
+      - name: Install dependencies (Linux)
+        run: |
+          sudo apt-get install clang-format-10
+      - uses: actions/checkout@v2
+      - name: Run clang-format on source code
+        run: |
+          find . \
+            -name ".git" -prune -o \
+            -name "*.cpp" -type f -exec clang-format -i --verbose {} + -o \
+            -name "*.h" -type f -exec clang-format -i --verbose {} +
+      - name: Check for code differences
+        run: |
+          set +e
+          git diff --color
+          git diff-index --quiet HEAD --; EXIT_CODE=$?
+          set -e
+          if [ $EXIT_CODE -ne 0 ]; then echo "C++ code formatting check failed.  Please run clang-format on *.h and *.cpp, then push your changes."; fi
+          exit $EXIT_CODE
