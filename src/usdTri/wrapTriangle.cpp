@@ -1,3 +1,8 @@
+//
+// Copyright © 2020 Weta Digital Limited
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 #include "./triangle.h"
 #include "pxr/usd/usd/schemaBase.h"
 

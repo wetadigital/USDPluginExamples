@@ -1,3 +1,8 @@
+//
+// Copyright © 2020 Weta Digital Limited
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 #pragma once
 
 PXR_NAMESPACE_OPEN_SCOPE

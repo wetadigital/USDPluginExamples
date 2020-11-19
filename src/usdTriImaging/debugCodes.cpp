@@ -1,3 +1,8 @@
+//
+// Copyright © 2020 Weta Digital Limited
+//
+// SPDX-License-Identifier: Apache-2.0
+//
 #include "debugCodes.h"
 
 #include <pxr/base/tf/registryManager.h>
