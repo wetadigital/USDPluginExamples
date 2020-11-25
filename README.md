@@ -6,7 +6,7 @@ A collection of example plugins for [Pixar's USD](https://github.com/PixarAnimat
 
 This project also aims to provide a set of CMake utilities for building USD plugins outside of the USD project source tree.  The utilities are heavily based on the build logic prescribed by the USD project itself. 
 
-We hope the minimal examples and surrounding infrastructure can be useful to USD community developers interested in building and deploying their own plugin(s).  
+We hope the minimal examples and surrounding build infrastructure can be useful to USD community developers interested in building and deploying their own plugin(s).  
 
 Huge thanks to Pixar's USD team for providing a highly extensible platform!
 
