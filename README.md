@@ -48,6 +48,7 @@ cmake \
   -DUSD_ROOT="/apps/usd/20.11/" \
   -DTBB_ROOT="/apps/usd/20.11/" \
   -DBOOST_ROOT="/apps/usd/20.11/" \
+  -DBUILD_TESTING=ON \
   -DCMAKE_INSTALL_PREFIX="/apps/USDPluginExamples/" \
   ..
 cmake --build  . -- VERBOSE=1 -j8 all test install
