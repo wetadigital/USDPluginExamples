@@ -11,12 +11,13 @@ add_subdirectory(usdTriImaging)
 add_subdirectory(usdTriFileFormat)
 add_subdirectory(hdTri)
 
-# Install top-level plugInfo.json(s) for including libraries and plugins.
+# Install top-level plugInfo for including per-library plugInfo(s).
 install(
     FILES plugInfo.json
     DESTINATION ${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}
 )
 
+# Install top-level plugInfo for including per-plugin plugInfo(s).
 install(
     FILES plugInfo.json
     DESTINATION ${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}
