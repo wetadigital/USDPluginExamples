@@ -179,6 +179,13 @@ function(_usd_library NAME)
             ${PYTHON_INCLUDE_DIR}
             ${Boost_INCLUDE_DIR}
             ${TBB_INCLUDE_DIRS}
+            ${USD_INCLUDE_DIR}
+    )
+
+    # Set-up library search path.
+    target_link_directories(${NAME}
+        PRIVATE
+            ${USD_LIBRARY_DIR}
     )
 
     # Link to libraries.
@@ -296,6 +303,12 @@ function(_usd_library NAME)
                     MFB_PACKAGE_NAME=${NAME}
                     MFB_ALT_PACKAGE_NAME=${NAME}
                     MFB_PACKAGE_MODULE=${PYTHON_MODULE_NAME}
+            )
+
+            # Set-up library search path.
+            target_link_directories(${PYLIB_NAME}
+                PRIVATE
+                    ${USD_LIBRARY_DIR}
             )
 
             # Apply link dependencies.
