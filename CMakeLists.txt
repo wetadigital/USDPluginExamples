@@ -1,5 +1,5 @@
-# Minimum CMake version aligned with release branch of USD.
-cmake_minimum_required(VERSION 3.12)
+# 3.13 for target_link_directories.
+cmake_minimum_required(VERSION 3.13)
 
 # Define project.
 project(
