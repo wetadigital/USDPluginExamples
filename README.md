@@ -25,6 +25,7 @@ Huge thanks to Pixar's USD team for providing a highly extensible platform!
 - [usdTriImaging](./src/usdTriImaging): A prim adapter which images the **Triangle** prim type.
 - [usdTriFileFormat](./src/usdTriFileFormat): A file format plugin which authors a triangular mesh for a `.triangle` payload.
 - [hdTri](./src/hdTri): A hydra renderer plugin which images a triangle (in the most direct sense).
+- [usdviewTri](./src/usdviewTri): An usdview plugin providing a menu command to define child Triangle prim(s) under selected paths.
 
 There are many other USD plugins available online - check out [USD Working Group: Projects & Resources](https://wiki.aswf.io/display/WGUSD/USD+Projects+and+Resources) for more!
 
