@@ -134,6 +134,47 @@ function(usd_plugin NAME)
     )
 endfunction()
 
+# Public entry point for building python-and-resource-files only library.
+# This was _specifically_ exposed to produce plugins for usdview, but can be useful
+# for deploying python plugins in general that adhere to the installation structure
+# prescribed by USDPluginTools.
+#
+function(usd_python_library NAME)
+    set(options)
+
+    set(oneValueArgs
+    )
+
+    set(multiValueArgs
+        PYTHON_INSTALL_PREFIX
+        PYTHON_FILES
+        RESOURCE_FILES
+    )
+
+    cmake_parse_arguments(args
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    if (ENABLE_PYTHON_SUPPORT)
+        _usd_python_module(${NAME}
+            PYTHON_INSTALL_PREFIX
+                ${args_PYTHON_INSTALL_PREFIX}
+            PYTHON_FILES
+                ${args_PYTHON_FILES}
+        )
+
+        _usd_install_resource_files(${NAME}
+            TYPE
+                SHARED
+            RESOURCE_FILES
+                ${args_RESOURCE_FILES}
+        )
+    endif()
+endfunction()
+
 # Adds a USD-based python test which is executed by CTest.
 # The python file is simply executed by the python interpreter
 # with no special arguments.
