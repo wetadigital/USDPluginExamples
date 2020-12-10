@@ -13,23 +13,126 @@ set(USD_PYTHON_DIR "python")
 set(USD_PLUG_INFO_RESOURCES_DIR "resources")
 set(USD_PLUG_INFO_ROOT_DIR "usd")
 
-# Build a USD shared library.
-macro(usd_shared_library NAME)
-    _usd_library(${NAME}
-        TYPE
-            "SHARED"
+#
+# Public entry point for building a C++ based USD shared library.
+#
+function(usd_shared_library NAME)
+    set(options)
+
+    set(oneValueArgs
+    )
+
+    set(multiValueArgs
+        PUBLIC_HEADERS_INSTALL_PREFIX
+        PUBLIC_HEADERS
+        PUBLIC_CLASSES
+        CPPFILES
+        LIBRARIES
+        INCLUDE_DIRS
+        RESOURCE_FILES
+        PYTHON_INSTALL_PREFIX
+        PYTHON_FILES
+        PYTHON_CPPFILES
+        PYMODULE_CPPFILES
+    )
+
+    cmake_parse_arguments(args
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
         ${ARGN}
     )
-endmacro(usd_shared_library)
 
-# Builds a USD plugin.
-macro(usd_plugin NAME)
-    _usd_library(${NAME}
+    _usd_cpp_library(${NAME}
+        TYPE
+            SHARED
+        PUBLIC_HEADERS_INSTALL_PREFIX
+            ${args_PUBLIC_HEADERS_INSTALL_PREFIX}
+        PUBLIC_HEADERS
+            ${args_PUBLIC_HEADERS}
+        PUBLIC_CLASSES
+            ${args_PUBLIC_CLASSES}
+        CPPFILES
+            ${args_CPPFILES}
+        LIBRARIES
+            ${args_LIBRARIES}
+        INCLUDE_DIRS
+            ${args_INCLUDE_DIRS}
+        PYTHON_CPPFILES
+            ${args_PYTHON_CPPFILES}
+    )
+
+    _usd_install_resource_files(${NAME}
+        TYPE
+            SHARED
+        RESOURCE_FILES
+            ${args_RESOURCE_FILES}
+    )
+
+    if (ENABLE_PYTHON_SUPPORT)
+        _usd_python_module(${NAME}
+            PYTHON_INSTALL_PREFIX
+                ${args_PYTHON_INSTALL_PREFIX}
+            LIBRARIES
+                ${args_LIBRARIES}
+            INCLUDE_DIRS
+                ${args_INCLUDE_DIRS}
+            PYMODULE_CPPFILES
+                ${args_PYMODULE_CPPFILES}
+            PYTHON_FILES
+                ${args_PYTHON_FILES}
+        )
+    endif()
+
+endfunction()
+
+#
+# Public entry point for building a C++ based USD plugin.
+#
+function(usd_plugin NAME)
+    set(options)
+
+    set(oneValueArgs
+    )
+
+    set(multiValueArgs
+        CPPFILES
+        LIBRARIES
+        INCLUDE_DIRS
+        RESOURCE_FILES
+    )
+
+    cmake_parse_arguments(args
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    _usd_cpp_library(${NAME}
         TYPE
             "PLUGIN"
-        ${ARGN}
+        PUBLIC_HEADERS_INSTALL_PREFIX
+            ${args_PUBLIC_HEADERS_INSTALL_PREFIX}
+        PUBLIC_HEADERS
+            ${args_PUBLIC_HEADERS}
+        PUBLIC_CLASSES
+            ${args_PUBLIC_CLASSES}
+        CPPFILES
+            ${args_CPPFILES}
+        LIBRARIES
+            ${args_LIBRARIES}
+        INCLUDE_DIRS
+            ${args_INCLUDE_DIRS}
     )
-endmacro(usd_plugin)
+
+    _usd_install_resource_files(${NAME}
+        TYPE
+            "PLUGIN"
+        RESOURCE_FILES
+            ${args_RESOURCE_FILES}
+    )
+endfunction()
 
 # Adds a USD-based python test which is executed by CTest.
 # The python file is simply executed by the python interpreter
@@ -59,14 +162,10 @@ function(usd_python_test TEST_PREFIX PYTHON_FILE)
     )
 endfunction()
 
-# Internal function for building a library against USD.
 #
-# The function interface is based on USD's pxr_library, but currently only exposes a subset
-# of features.  It also exposes the *_INSTALL_PREFIX arguments which are not part of the pxr macros.
+# Internal function for building a USD-based C++ library.
 #
-# The difference between PYTHON_CPPFILES and PYMODULE_CPPFILES is that the former is built as part
-# of the C++ library (if python support is enabled, of course).
-function(_usd_library NAME)
+function(_usd_cpp_library NAME)
     set(options)
 
     set(oneValueArgs
@@ -80,11 +179,7 @@ function(_usd_library NAME)
         CPPFILES
         LIBRARIES
         INCLUDE_DIRS
-        RESOURCE_FILES
-        PYTHON_INSTALL_PREFIX
-        PYTHON_FILES
         PYTHON_CPPFILES
-        PYMODULE_CPPFILES
     )
 
     cmake_parse_arguments(args
@@ -129,9 +224,6 @@ function(_usd_library NAME)
         endif()
     endif()
 
-    #
-    # Build C++ library.
-    #
 
     # Determine public header install location.
     if (args_PUBLIC_HEADERS_INSTALL_PREFIX)
@@ -197,16 +289,12 @@ function(_usd_library NAME)
             ${TBB_LIBRARIES}
     )
 
-    # Differentiate between  "shared library" vs "plugin".
-    #
-    # LIBRARY_INSTALL_PREFIX is the sub-directory under installation root where the
-    # shared library will be deployed.
-    #
-    # LIBRARY_FILE_PREFIX is the filename prefix. ("lib" on Linux)
-    if (args_TYPE STREQUAL "PLUGIN")
-        set(LIBRARY_INSTALL_PREFIX ${USD_PLUGIN_DIR})
-        set(LIBRARY_FILE_PREFIX "")
+    _usd_compute_library_install_and_file_prefix(${args_TYPE}
+        LIBRARY_INSTALL_PREFIX
+        LIBRARY_FILE_PREFIX
+    )
 
+    if (args_TYPE STREQUAL "PLUGIN")
         # Install the plugin.
         # We do not need to export the target because plugins are _not_
         # meant to be built against.
@@ -215,9 +303,6 @@ function(_usd_library NAME)
             LIBRARY DESTINATION ${LIBRARY_INSTALL_PREFIX}
         )
     else()
-        set(LIBRARY_INSTALL_PREFIX ${CMAKE_INSTALL_LIBDIR})
-        set(LIBRARY_FILE_PREFIX ${CMAKE_SHARED_LIBRARY_PREFIX})
-
         # Setup SOVERSION & VERSION properties to create
         # NAMELINK, SONAME, and actual library with full version suffix.
         set_target_properties(${NAME}
@@ -249,129 +334,176 @@ function(_usd_library NAME)
             PREFIX "${LIBRARY_FILE_PREFIX}"
     )
 
-    # Compose the full name of the library.
-    # This will be used when performing variable substition on the plugInfo.json resource file.
-    set(LIBRARY_FILE_NAME ${LIBRARY_FILE_PREFIX}${NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+endfunction() # _usd_cpp_library
 
-    if (ENABLE_PYTHON_SUPPORT)
+#
+# Internal function for build a C++ python module with python files.
+#
+function(_usd_python_module NAME)
+    set(options)
 
-        # Public module name (example: UsdTri)
-        _usd_get_python_module_name(${NAME} PYTHON_MODULE_NAME)
+    set(oneValueArgs
+        TYPE
+    )
 
-        # Construct the installation prefix for the python modules & files.
-        if (args_PYTHON_INSTALL_PREFIX)
-            set(PYTHON_INSTALL_PREFIX ${LIBRARY_INSTALL_PREFIX}/${USD_PYTHON_DIR}/${args_PYTHON_INSTALL_PREFIX}/${PYTHON_MODULE_NAME})
-        else()
-            set(PYTHON_INSTALL_PREFIX ${LIBRARY_INSTALL_PREFIX}/${USD_PYTHON_DIR}/${PYTHON_MODULE_NAME})
-        endif()
+    set(multiValueArgs
+        LIBRARIES
+        INCLUDE_DIRS
+        PYTHON_INSTALL_PREFIX
+        PYTHON_FILES
+        PYMODULE_CPPFILES
+    )
 
-        #
-        # Python module / bindings.
-        #
+    cmake_parse_arguments(args
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
 
-        if (args_PYMODULE_CPPFILES)
+    # Public module name (example: UsdTri)
+    _usd_get_python_module_name(${NAME} PYTHON_MODULE_NAME)
 
-            # Target name.
-            set(PYLIB_NAME "_${NAME}")
-
-            # Add a library target.
-            add_library(${PYLIB_NAME}
-                MODULE
-            )
-
-            # Add sources for building the target.
-            target_sources(${PYLIB_NAME}
-                PRIVATE
-                    ${args_PYMODULE_CPPFILES}
-            )
-
-            # Lose the library prefix.
-            set_target_properties(${PYLIB_NAME}
-                PROPERTIES
-                    PREFIX ""
-            )
-
-            # Apply common compilation properties, and include path properties.
-            _set_library_properties(${PYLIB_NAME}
-                INCLUDE_DIRS
-                    ${PYTHON_INCLUDE_DIR}
-                    ${Boost_INCLUDE_DIR}
-                    ${USD_INCLUDE_DIR}
-                    ${TBB_INCLUDE_DIRS}
-                    ${args_INCLUDE_DIRS}
-                DEFINES
-                    MFB_PACKAGE_NAME=${NAME}
-                    MFB_ALT_PACKAGE_NAME=${NAME}
-                    MFB_PACKAGE_MODULE=${PYTHON_MODULE_NAME}
-            )
-
-            # Set-up library search path.
-            target_link_directories(${PYLIB_NAME}
-                PRIVATE
-                    ${USD_LIBRARY_DIR}
-            )
-
-            # Apply link dependencies.
-            target_link_libraries(${PYLIB_NAME}
-                PRIVATE
-                    ${Boost_PYTHON_LIBRARY}
-                    ${PYTHON_LIBRARIES}
-                    ${TBB_LIBRARIES}
-                    ${args_LIBRARIES}
-                    ${NAME}
-            )
-
-            # Mirror installation structure in PROJECT_BINARY_DIR - for running tests against.
-            if (BUILD_TESTING)
-                add_custom_command(
-                    TARGET ${PYLIB_NAME}
-                    POST_BUILD
-                        COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${PYLIB_NAME}> ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX}/$<TARGET_FILE_NAME:${PYLIB_NAME}>
-                )
-            endif()
-
-            # Install python module library.
-            install(
-                TARGETS
-                    ${PYLIB_NAME}
-                RENAME
-                    ${PYLIB_NAME}.so
-                DESTINATION
-                    ${PYTHON_INSTALL_PREFIX}
-            )
-        endif()
-
-        #
-        # Install python files.
-        #
-
-        if (ENABLE_PYTHON_SUPPORT AND args_PYTHON_FILES)
-
-            # If tests are enabled - copy these files into project binary dir
-            # _mirroring_ the install structure, such that we can run tests against
-            # them.
-            if (BUILD_TESTING)
-                foreach(pythonFile ${args_PYTHON_FILES})
-                    file(
-                        COPY ${CMAKE_CURRENT_SOURCE_DIR}/${pythonFile}
-                        DESTINATION ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX}
-                    )
-                endforeach()
-            endif()
-
-            # Install python files.
-            install(
-                FILES
-                    ${args_PYTHON_FILES}
-                DESTINATION
-                    ${PYTHON_INSTALL_PREFIX}
-            )
-        endif()
+    # Construct the installation prefix for the python modules & files.
+    if (args_PYTHON_INSTALL_PREFIX)
+        set(PYTHON_INSTALL_PREFIX ${CMAKE_INSTALL_LIBDIR}/${USD_PYTHON_DIR}/${args_PYTHON_INSTALL_PREFIX}/${PYTHON_MODULE_NAME})
+    else()
+        set(PYTHON_INSTALL_PREFIX ${CMAKE_INSTALL_LIBDIR}/${USD_PYTHON_DIR}/${PYTHON_MODULE_NAME})
     endif()
 
     #
-    # Install resource files.
+    # Python module / bindings.
     #
+
+    if (args_PYMODULE_CPPFILES)
+
+        # Target name.
+        set(PYLIB_NAME "_${NAME}")
+
+        # Add a library target.
+        add_library(${PYLIB_NAME}
+            MODULE
+        )
+
+        # Add sources for building the target.
+        target_sources(${PYLIB_NAME}
+            PRIVATE
+                ${args_PYMODULE_CPPFILES}
+        )
+
+        # Lose the library prefix.
+        set_target_properties(${PYLIB_NAME}
+            PROPERTIES
+                PREFIX ""
+        )
+
+        # Apply common compilation properties, and include path properties.
+        _set_library_properties(${PYLIB_NAME}
+            INCLUDE_DIRS
+                ${PYTHON_INCLUDE_DIR}
+                ${Boost_INCLUDE_DIR}
+                ${USD_INCLUDE_DIR}
+                ${TBB_INCLUDE_DIRS}
+                ${args_INCLUDE_DIRS}
+            DEFINES
+                MFB_PACKAGE_NAME=${NAME}
+                MFB_ALT_PACKAGE_NAME=${NAME}
+                MFB_PACKAGE_MODULE=${PYTHON_MODULE_NAME}
+        )
+
+        # Set-up library search path.
+        target_link_directories(${PYLIB_NAME}
+            PRIVATE
+                ${USD_LIBRARY_DIR}
+        )
+
+        # Apply link dependencies.
+        target_link_libraries(${PYLIB_NAME}
+            PRIVATE
+                ${Boost_PYTHON_LIBRARY}
+                ${PYTHON_LIBRARIES}
+                ${TBB_LIBRARIES}
+                ${args_LIBRARIES}
+                ${NAME}
+        )
+
+        # Mirror installation structure in PROJECT_BINARY_DIR - for running tests against.
+        if (BUILD_TESTING)
+            add_custom_command(
+                TARGET ${PYLIB_NAME}
+                POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${PYLIB_NAME}> ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX}/$<TARGET_FILE_NAME:${PYLIB_NAME}>
+            )
+        endif()
+
+        # Install python module library.
+        install(
+            TARGETS
+                ${PYLIB_NAME}
+            RENAME
+                ${PYLIB_NAME}${CMAKE_SHARED_LIBRARY_SUFFIX}
+            DESTINATION
+                ${PYTHON_INSTALL_PREFIX}
+        )
+    endif()
+
+    #
+    # Install python files.
+    #
+
+    if (args_PYTHON_FILES)
+
+        # If tests are enabled - copy these files into project binary dir
+        # _mirroring_ the install structure, such that we can run tests against
+        # them.
+        if (BUILD_TESTING)
+            foreach(pythonFile ${args_PYTHON_FILES})
+                file(
+                    COPY ${CMAKE_CURRENT_SOURCE_DIR}/${pythonFile}
+                    DESTINATION ${PROJECT_BINARY_DIR}/${PYTHON_INSTALL_PREFIX}
+                )
+            endforeach()
+        endif()
+
+        # Install python files.
+        install(
+            FILES
+                ${args_PYTHON_FILES}
+            DESTINATION
+                ${PYTHON_INSTALL_PREFIX}
+        )
+    endif()
+endfunction() # _usd_python_module
+
+#
+# Internal function for installing resource files (plugInfo, etc).
+#
+function(_usd_install_resource_files NAME)
+    set(options)
+
+    set(oneValueArgs
+        TYPE
+    )
+
+    set(multiValueArgs
+        RESOURCE_FILES
+    )
+
+    cmake_parse_arguments(args
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    _usd_compute_library_install_and_file_prefix(${args_TYPE}
+        LIBRARY_INSTALL_PREFIX
+        LIBRARY_FILE_PREFIX
+    )
+
+    # Compose the full name of the library.
+    # This will be used when performing variable substition on the plugInfo.json resource file.
+    set(LIBRARY_FILE_NAME ${LIBRARY_FILE_PREFIX}${NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
 
     # Plugin resources will be installed as a 'usd' subdir under the library install location.
     set(RESOURCES_INSTALL_PREFIX ${LIBRARY_INSTALL_PREFIX}/${USD_PLUG_INFO_ROOT_DIR})
@@ -407,12 +539,34 @@ function(_usd_library NAME)
                 ${RESOURCES_INSTALL_PREFIX}/${NAME}/${USD_PLUG_INFO_RESOURCES_DIR}
         )
     endforeach()
+endfunction() # _usd_install_resource_files
 
+# Internal utility for differentiating between  "shared library" vs "plugin".
+#
+# Outputs:
+#   LIBRARY_INSTALL_PREFIX: The sub-directory under installation root where the
+#       shared library will be deployed.
+#   LIBRARY_FILE_PREFIX: The filename prefix of the shared library. ("lib" on Linux)
+function(_usd_compute_library_install_and_file_prefix
+    TYPE
+    LIBRARY_INSTALL_PREFIX
+    LIBRARY_FILE_PREFIX
+)
+    if (TYPE STREQUAL "PLUGIN")
+        set(${LIBRARY_INSTALL_PREFIX} ${USD_PLUGIN_DIR} PARENT_SCOPE)
+        set(${LIBRARY_FILE_PREFIX} "" PARENT_SCOPE)
+    else()
+        set(${LIBRARY_INSTALL_PREFIX} ${CMAKE_INSTALL_LIBDIR} PARENT_SCOPE)
+        set(${LIBRARY_FILE_PREFIX} ${CMAKE_SHARED_LIBRARY_PREFIX} PARENT_SCOPE)
+    endif()
 endfunction()
 
 # Converts a library name, such as _tf.so to the internal module name given
 # our naming conventions, e.g. Tf
-function(_usd_get_python_module_name LIBRARY_FILENAME MODULE_NAME)
+function(_usd_get_python_module_name
+    LIBRARY_FILENAME
+    MODULE_NAME
+)
     # Library names are either something like tf.so for shared libraries
     # or _tf.pyd/_tf_d.pyd for Python module libraries.
     # We want to strip off the leading "_" and the trailing "_d".
@@ -425,10 +579,14 @@ function(_usd_get_python_module_name LIBRARY_FILENAME MODULE_NAME)
         "${LIBNAME_FL}${LIBNAME_SUFFIX}"
         PARENT_SCOPE
     )
-endfunction()
+endfunction() # _usd_get_python_module_name
 
 # Performs variable substitution in a plugInfo.json file.
-function(_usd_plug_info_subst LIBRARY_TARGET RESOURCE_TO_LIBRARY_PATH PLUG_INFO_PATH)
+function(_usd_plug_info_subst
+    LIBRARY_TARGET
+    RESOURCE_TO_LIBRARY_PATH
+    PLUG_INFO_PATH
+)
     set(PLUG_INFO_ROOT "..")
     set(PLUG_INFO_LIBRARY_PATH ${RESOURCE_TO_LIBRARY_PATH})
     set(PLUG_INFO_RESOURCE_PATH ${USD_PLUG_INFO_RESOURCES_DIR})
@@ -436,11 +594,10 @@ function(_usd_plug_info_subst LIBRARY_TARGET RESOURCE_TO_LIBRARY_PATH PLUG_INFO_
         ${PLUG_INFO_PATH}
         ${CMAKE_CURRENT_BINARY_DIR}/${PLUG_INFO_PATH}
     )
-endfunction()
+endfunction() # _usd_plug_info_subst
 
 # Common target-specific properties to apply to library targets.
-function(
-    _set_library_properties
+function(_set_library_properties
     TARGET_NAME
 )
     set(options)
