@@ -16,7 +16,7 @@ Huge thanks to Pixar's USD team for providing a highly extensible platform!
 - [Dependencies](#dependencies)
 - [Building](#building)
 - [Running](#running)
-- [As a template](#as-a-template)
+- [CMake Utilities](#cmake-utilities)
 
 ## USD Plugins
 
@@ -86,13 +86,15 @@ usdview ./src/usdTri/scenes/triangle.usda
 In the viewport, a triangle should be centered at origin:
 ![Triangle](./images/triangle_in_viewport.png)
 
-## As a template
+## CMake Utilities
 
-**USDPluginExamples** can be used as a template ("Use this template" button near the top of the page).
-
-Custom CMake macros are provided, for abstracting away USD plugin build intricacies:
+Custom CMake functions are provided, for abstracting away USD plugin build intricacies:
 - `usd_shared_library`: [Example usage](./src/usdTri/CMakeLists.txt)
 - `usd_plugin`: [Example usage](./src/hdTri/CMakeLists.txt)
 - `usd_python_test`: [Example usage](./src/usdTri/tests/CMakeLists.txt)
 
-The interface of the above macros are largely based on those used throughout the [official USD project](https://github.com/PixarAnimationStudios/USD).
+The interface of the above functions are largely based on those used throughout the [official USD project](https://github.com/PixarAnimationStudios/USD).
+
+**USDPluginExamples** can be used as a template ("Use this template" button near the top of the page).
+
+Another option to gain access to the cmake utilities is to copy/integrate the files under [cmake/](./cmake) into an existing project.
