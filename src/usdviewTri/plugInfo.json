@@ -1,0 +1,16 @@
+{
+    "Plugins": [
+        {
+            "Type": "python",
+            "Name": "usdpluginexamples.UsdviewTri",
+            "Info": {
+                "Types": {
+                    "usdpluginexamples.UsdviewTri.UsdviewTriPluginContainer": {
+                        "bases": ["pxr.Usdviewq.plugin.PluginContainer"],
+                        "displayName": "Usdview Tri Plugin"
+                    }
+                }
+            }
+        }
+    ]
+}
