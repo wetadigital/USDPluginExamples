@@ -138,28 +138,27 @@ endfunction()
 # The python file is simply executed by the python interpreter
 # with no special arguments.
 function(usd_python_test TEST_PREFIX PYTHON_FILE)
-    if (NOT ENABLE_PYTHON_SUPPORT)
-        message(FATAL_ERROR
-                "Cannot use usd_python_test without python support.  Please configure with ENABLE_PYTHON_SUPPORT=ON.")
+    if (ENABLE_PYTHON_SUPPORT)
+        # Create a test target based on a named test prefix
+        # and the python file name.
+        get_filename_component(TEST_NAME ${PYTHON_FILE} NAME_WE)
+        set(PYTHON_TEST_TARGET ${TEST_PREFIX}_${TEST_NAME})
+        add_test(
+            NAME ${PYTHON_TEST_TARGET}
+            COMMAND ${PYTHON_EXECUTABLE} ${PYTHON_FILE}
+            WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+        )
+
+        # Set-up runtime environment variables for the test.
+        # The paths refer to the build tree (which mirrors the final installation).
+        set_tests_properties(${PYTHON_TEST_TARGET}
+            PROPERTIES
+                ENVIRONMENT
+                "PYTHONPATH=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python:${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python:$ENV{PYTHONPATH};PXR_PLUGINPATH_NAME=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}:${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}:$ENV{PXR_PLUGINPATH_NAME}"
+        )
+    else()
+        message(STATUS "ENABLE_PYTHON_SUPPORT is OFF, skipping python test: ${TEST_PREFIX} ${PYTHON_FILE}")
     endif()
-
-    # Create a test target based on a named test prefix
-    # and the python file name.
-    get_filename_component(TEST_NAME ${PYTHON_FILE} NAME_WE)
-    set(PYTHON_TEST_TARGET ${TEST_PREFIX}_${TEST_NAME})
-    add_test(
-        NAME ${PYTHON_TEST_TARGET}
-        COMMAND ${PYTHON_EXECUTABLE} ${PYTHON_FILE}
-        WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
-    )
-
-    # Set-up runtime environment variables for the test.
-    # The paths refer to the build tree (which mirrors the final installation).
-    set_tests_properties(${PYTHON_TEST_TARGET}
-        PROPERTIES
-            ENVIRONMENT
-            "PYTHONPATH=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python:${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python:$ENV{PYTHONPATH};PXR_PLUGINPATH_NAME=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}:${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}:$ENV{PXR_PLUGINPATH_NAME}"
-    )
 endfunction()
 
 #
