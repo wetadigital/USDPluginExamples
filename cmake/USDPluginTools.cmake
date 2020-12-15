@@ -280,12 +280,14 @@ function(_usd_cpp_library NAME)
     )
 
     # Link to libraries.
+    set(_LINK_LIBRARIES "")
+    list(APPEND _LINK_LIBRARIES ${args_LIBRARIES} ${TBB_LIBRARIES})
+    if (ENABLE_PYTHON_SUPPORT)
+        list(APPEND _LINK_LIBRARIES ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+    endif()
     target_link_libraries(${NAME}
         PRIVATE
-            ${args_LIBRARIES}
-            ${Boost_PYTHON_LIBRARY}
-            ${PYTHON_LIBRARIES}
-            ${TBB_LIBRARIES}
+            ${_LINK_LIBRARIES}
     )
 
     _usd_compute_library_install_and_file_prefix(${args_TYPE}
