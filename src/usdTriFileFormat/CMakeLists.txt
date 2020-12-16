@@ -16,6 +16,4 @@ usd_plugin(usdTriFileFormat
         plugInfo.json
 )
 
-if (BUILD_TESTING)
-    add_subdirectory(tests)
-endif()
+add_subdirectory(tests)
