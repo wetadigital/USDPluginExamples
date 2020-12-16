@@ -1,4 +1,1 @@
-file(GLOB PYTHONFILES *.py)
-foreach(PYTHONFILE ${PYTHONFILES})
-    usd_python_test(usdTriFileFormat ${PYTHONFILE})
-endforeach()
+usd_python_test(usdTriFileFormat_python testFileFormat.py)

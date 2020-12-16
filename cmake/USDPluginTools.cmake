@@ -13,6 +13,9 @@ set(USD_PYTHON_DIR "python")
 set(USD_PLUG_INFO_RESOURCES_DIR "resources")
 set(USD_PLUG_INFO_ROOT_DIR "usd")
 
+# Paths set on the PXR_PLUGIN_PATH env var when running tests.
+set(_TEST_PXR_PLUGIN_PATH "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}:${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}:$ENV{PXR_PLUGINPATH_NAME}")
+
 #
 # Public entry point for building a C++ based USD shared library.
 #
@@ -175,6 +178,54 @@ function(usd_python_library NAME)
     endif()
 endfunction()
 
+# Adds a USD-based cpp test which is executed by CTest.
+function(usd_test TEST_TARGET)
+    set(options)
+
+    set(oneValueArgs
+    )
+
+    set(multiValueArgs
+        CPPFILES
+        LIBRARIES
+        INCLUDE_DIRS
+    )
+
+    cmake_parse_arguments(args
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    # Define a new executable.
+    add_executable(${TEST_TARGET}
+        ${args_CPPFILES}
+    )
+
+    # Apply properties.
+    _usd_target_properties(${TEST_TARGET}
+        INCLUDE_DIRS
+            ${args_INCLUDE_DIRS}
+        LIBRARIES
+            ${args_LIBRARIES}
+    )
+
+    # Add the test target.
+    add_test(
+        NAME ${TEST_TARGET}
+        COMMAND $<TARGET_FILE:${TEST_TARGET}>
+    )
+
+    # Set-up runtime environment variables for the test.
+    # The paths refer to the build tree (which mirrors the final installation).
+    set_tests_properties(${TEST_TARGET}
+        PROPERTIES
+            ENVIRONMENT
+            "PXR_PLUGINPATH_NAME=${_TEST_PXR_PLUGIN_PATH};ARCH_AVOID_JIT=1"
+    )
+endfunction()
+
 # Adds a USD-based python test which is executed by CTest.
 # The python file is simply executed by the python interpreter
 # with no special arguments.
@@ -195,7 +246,7 @@ function(usd_python_test TEST_PREFIX PYTHON_FILE)
         set_tests_properties(${PYTHON_TEST_TARGET}
             PROPERTIES
                 ENVIRONMENT
-                "PYTHONPATH=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python:${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python:$ENV{PYTHONPATH};PXR_PLUGINPATH_NAME=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}:${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}:$ENV{PXR_PLUGINPATH_NAME}"
+                "PYTHONPATH=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python:${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python:$ENV{PYTHONPATH};PXR_PLUGINPATH_NAME=${_TEST_PXR_PLUGIN_PATH}"
         )
     else()
         message(STATUS "ENABLE_PYTHON_SUPPORT is OFF, skipping python test: ${TEST_PREFIX} ${PYTHON_FILE}")
@@ -305,30 +356,11 @@ function(_usd_cpp_library NAME)
     )
 
     # Apply common compiler properties, and include path properties.
-    _set_library_properties(${NAME}
+    _usd_target_properties(${NAME}
         INCLUDE_DIRS
             ${args_INCLUDE_DIRS}
-            ${PYTHON_INCLUDE_DIR}
-            ${Boost_INCLUDE_DIR}
-            ${TBB_INCLUDE_DIRS}
-            ${USD_INCLUDE_DIR}
-    )
-
-    # Set-up library search path.
-    target_link_directories(${NAME}
-        PRIVATE
-            ${USD_LIBRARY_DIR}
-    )
-
-    # Link to libraries.
-    set(_LINK_LIBRARIES "")
-    list(APPEND _LINK_LIBRARIES ${args_LIBRARIES} ${TBB_LIBRARIES})
-    if (ENABLE_PYTHON_SUPPORT)
-        list(APPEND _LINK_LIBRARIES ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
-    endif()
-    target_link_libraries(${NAME}
-        PRIVATE
-            ${_LINK_LIBRARIES}
+        LIBRARIES
+            ${args_LIBRARIES}
     )
 
     _usd_compute_library_install_and_file_prefix(${args_TYPE}
@@ -440,31 +472,14 @@ function(_usd_python_module NAME)
         )
 
         # Apply common compilation properties, and include path properties.
-        _set_library_properties(${PYLIB_NAME}
+        _usd_target_properties(${PYLIB_NAME}
             INCLUDE_DIRS
-                ${PYTHON_INCLUDE_DIR}
-                ${Boost_INCLUDE_DIR}
-                ${USD_INCLUDE_DIR}
-                ${TBB_INCLUDE_DIRS}
                 ${args_INCLUDE_DIRS}
             DEFINES
                 MFB_PACKAGE_NAME=${NAME}
                 MFB_ALT_PACKAGE_NAME=${NAME}
                 MFB_PACKAGE_MODULE=${PYTHON_MODULE_NAME}
-        )
-
-        # Set-up library search path.
-        target_link_directories(${PYLIB_NAME}
-            PRIVATE
-                ${USD_LIBRARY_DIR}
-        )
-
-        # Apply link dependencies.
-        target_link_libraries(${PYLIB_NAME}
-            PRIVATE
-                ${Boost_PYTHON_LIBRARY}
-                ${PYTHON_LIBRARIES}
-                ${TBB_LIBRARIES}
+            LIBRARIES
                 ${args_LIBRARIES}
                 ${NAME}
         )
@@ -639,7 +654,7 @@ function(_usd_plug_info_subst
 endfunction() # _usd_plug_info_subst
 
 # Common target-specific properties to apply to library targets.
-function(_set_library_properties
+function(_usd_target_properties
     TARGET_NAME
 )
     set(options)
@@ -647,6 +662,7 @@ function(_set_library_properties
     set(multiValueArgs
         INCLUDE_DIRS
         DEFINES
+        LIBRARIES
     )
 
     cmake_parse_arguments(
@@ -681,9 +697,31 @@ function(_set_library_properties
 
     # Setup include path for binary dir.
     # We set external includes as SYSTEM so that their warnings are muted.
+    set(_INCLUDE_DIRS "")
+    list(APPEND _INCLUDE_DIRS ${args_INCLUDE_DIRS} ${USD_INCLUDE_DIR} ${TBB_INCLUDE_DIRS})
+    if (ENABLE_PYTHON_SUPPORT)
+        list(APPEND _INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+    endif()
     target_include_directories(${TARGET_NAME}
         SYSTEM
         PRIVATE
-            ${args_INCLUDE_DIRS}
+            ${_INCLUDE_DIRS}
     )
-endfunction() # _set_library_properties
+
+    # Set-up library search path.
+    target_link_directories(${TARGET_NAME}
+        PRIVATE
+            ${USD_LIBRARY_DIR}
+    )
+
+    # Link to libraries.
+    set(_LINK_LIBRARIES "")
+    list(APPEND _LINK_LIBRARIES ${args_LIBRARIES} ${TBB_LIBRARIES})
+    if (ENABLE_PYTHON_SUPPORT)
+        list(APPEND _LINK_LIBRARIES ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+    endif()
+    target_link_libraries(${TARGET_NAME}
+        PRIVATE
+            ${_LINK_LIBRARIES}
+    )
+endfunction() # _usd_target_properties
