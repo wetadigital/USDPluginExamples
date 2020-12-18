@@ -19,7 +19,7 @@ set(_TEST_PXR_PLUGIN_PATH "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_P
 #
 # Public entry point for building a C++ based USD shared library.
 #
-function(usd_shared_library NAME)
+function(usd_library NAME)
     set(options)
 
     set(oneValueArgs

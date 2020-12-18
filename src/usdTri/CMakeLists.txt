@@ -1,4 +1,4 @@
-usd_shared_library(usdTri
+usd_library(usdTri
 
     PUBLIC_HEADERS_INSTALL_PREFIX
         ${ORGANIZATION}
