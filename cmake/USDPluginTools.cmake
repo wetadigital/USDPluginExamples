@@ -178,6 +178,48 @@ function(usd_python_library NAME)
     endif()
 endfunction()
 
+# Adds a USD-based C++ executable application.
+function(usd_executable EXECUTABLE_NAME)
+
+    set(options)
+
+    set(oneValueArgs
+    )
+
+    set(multiValueArgs
+        CPPFILES
+        LIBRARIES
+        INCLUDE_DIRS
+    )
+
+    cmake_parse_arguments(args
+        "${options}"
+        "${oneValueArgs}"
+        "${multiValueArgs}"
+        ${ARGN}
+    )
+
+    # Define a new executable.
+    add_executable(${EXECUTABLE_NAME}
+        ${args_CPPFILES}
+    )
+
+    # Apply properties.
+    _usd_target_properties(${EXECUTABLE_NAME}
+        INCLUDE_DIRS
+            ${args_INCLUDE_DIRS}
+        LIBRARIES
+            ${args_LIBRARIES}
+    )
+
+    # Install built executable.
+    install(
+        TARGETS ${EXECUTABLE_NAME}
+        DESTINATION ${CMAKE_INSTALL_BINDIR}
+    )
+
+endfunction() # usd_executable
+
 # Adds a USD-based cpp test which is executed by CTest.
 function(usd_test TEST_TARGET)
 

@@ -42,4 +42,16 @@ usd_shared_library(usdTri
         plugInfo.json
 )
 
+usd_executable(triangleCounter
+
+    CPPFILES
+        triangleCounter.cpp
+
+    LIBRARIES
+        tf
+        sdf
+        usd
+        usdTri
+)
+
 add_subdirectory(tests)
