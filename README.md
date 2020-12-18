@@ -90,7 +90,7 @@ In the viewport, a triangle should be centered at origin:
 ## CMake Utilities
 
 Custom CMake functions are provided, for abstracting away USD plugin build intricacies:
-- `usd_shared_library`: [Example usage](./src/usdTri/CMakeLists.txt)
+- `usd_library`: [Example usage](./src/usdTri/CMakeLists.txt)
 - `usd_plugin`: [Example usage](./src/hdTri/CMakeLists.txt)
 - `usd_executable`: [Example usage](./src/usdTri/CMakeLists.txt#L45)
 - `usd_test`: [Example usage](./src/usdTri/tests/CMakeLists.txt#L3)
