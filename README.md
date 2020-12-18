@@ -92,10 +92,10 @@ In the viewport, a triangle should be centered at origin:
 Custom CMake functions are provided, for abstracting away USD plugin build intricacies:
 - `usd_shared_library`: [Example usage](./src/usdTri/CMakeLists.txt)
 - `usd_plugin`: [Example usage](./src/hdTri/CMakeLists.txt)
-- `usd_executable`: [Example usage](./src/usdTri/CMakeLists.txt#45)
-- `usd_test`: [Example usage](./src/usdTri/tests/CMakeLists.txt)
+- `usd_executable`: [Example usage](./src/usdTri/CMakeLists.txt#L45)
+- `usd_test`: [Example usage](./src/usdTri/tests/CMakeLists.txt#L3)
 - `usd_python_library`: [Example usage](./src/usdviewTri/CMakeLists.txt)
-- `usd_python_test`: [Example usage](./src/usdTri/tests/CMakeLists.txt)
+- `usd_python_test`: [Example usage](./src/usdTri/tests/CMakeLists.txt#L1)
 
 The interface of the above functions are largely based on those used throughout the [official USD project](https://github.com/PixarAnimationStudios/USD).
 
