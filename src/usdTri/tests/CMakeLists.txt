@@ -1,4 +1,6 @@
-usd_python_test(usdTri_python testTriangle.py)
+usd_python_test(usdTri_python_testTriangle
+    testTriangle.py
+)
 
 usd_test(usdTri_testTriangle
 
