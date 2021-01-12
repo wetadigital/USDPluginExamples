@@ -56,16 +56,24 @@ public:
 
     /// Create an instancer.
     virtual HdInstancer* CreateInstancer(HdSceneDelegate* delegate,
+#if PXR_VERSION >= 2102
+                                         const SdfPath& id) override;
+#else
                                          const SdfPath& id,
                                          const SdfPath& instancerId) override;
+#endif
 
     /// Destroy an instancer.
     virtual void DestroyInstancer(HdInstancer* instancer) override;
 
     /// Create a new Rprim.
     virtual HdRprim* CreateRprim(const TfToken& typeId,
+#if PXR_VERSION >= 2102
+                                 const SdfPath& rprimId) override;
+#else
                                  const SdfPath& rprimId,
                                  const SdfPath& instancerId) override;
+#endif
 
     virtual void DestroyRprim(HdRprim* rprim) override;
 

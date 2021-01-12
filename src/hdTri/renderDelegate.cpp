@@ -92,8 +92,12 @@ HdTriRenderDelegate::CommitResources(HdChangeTracker* tracker)
 
 HdRprim*
 HdTriRenderDelegate::CreateRprim(const TfToken& typeId,
+#if PXR_VERSION >= 2102
+                                 const SdfPath& rprimId)
+#else
                                  const SdfPath& rprimId,
                                  const SdfPath& instancerId)
+#endif
 {
     TF_DEBUG(HDTRI_GENERAL)
         .Msg("[%s] Create HdTri Rprim type %s id %s\n",
@@ -177,12 +181,14 @@ HdTriRenderDelegate::DestroyBprim(HdBprim* bprim)
 
 HdInstancer*
 HdTriRenderDelegate::CreateInstancer(HdSceneDelegate* delegate,
+#if PXR_VERSION >= 2102
+                                     const SdfPath& id)
+#else
                                      const SdfPath& id,
                                      const SdfPath& instancerId)
+#endif
 {
-    TF_CODING_ERROR("Creating Instancer not supported id=%s instancerId=%s",
-                    id.GetText(),
-                    instancerId.GetText());
+    TF_CODING_ERROR("Creating Instancer not supported id=%s", id.GetText());
     return nullptr;
 }
 
