@@ -444,11 +444,21 @@ function(_usd_cpp_library NAME)
 
     # Mirror installation structure in PROJECT_BINARY_DIR - for running tests against.
     if (BUILD_TESTING)
-        add_custom_command(
-            TARGET ${NAME}
-            POST_BUILD
-                COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/${LIBRARY_INSTALL_PREFIX}/$<TARGET_FILE_NAME:${NAME}>
-        )
+        if (args_TYPE STREQUAL "PLUGIN")
+            # Building a plugin, does not need versioning info.
+            add_custom_command(
+                TARGET ${NAME}
+                POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/${LIBRARY_INSTALL_PREFIX}/$<TARGET_FILE_NAME:${NAME}>
+            )
+        else()
+            # Building a library.  Create namelink symlink.
+            add_custom_command(
+                TARGET ${NAME}
+                POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/${LIBRARY_INSTALL_PREFIX}/$<TARGET_LINKER_FILE_NAME:${NAME}>
+            )
+        endif()
     endif()
 
     # Update the target properties.
