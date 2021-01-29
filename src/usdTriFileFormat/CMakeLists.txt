@@ -11,6 +11,7 @@ usd_plugin(usdTriFileFormat
         pcp
         usd
         usdGeom
+        arch
 
     RESOURCE_FILES
         plugInfo.json
