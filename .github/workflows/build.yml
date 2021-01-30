@@ -18,6 +18,76 @@ on:
       - 'images/**'
 
 jobs:
+
+  # A build job matrix based on pre-built USD binaries provided by NVIDIA.
+  nvidia-usd-binaries-linux-build:
+    strategy:
+      matrix:
+        usdVersion:
+          - 20.08
+          - 20.11
+          - 21.02
+        include:
+          - usdVersion: 20.08
+            usdVersionUrl: 20.08
+            pythonVersion: 3.6
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: 'ON'
+          - usdVersion: 20.11
+            usdVersionUrl: 20-11
+            pythonVersion: 3.6
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: 'ON'
+          - usdVersion: 21.02
+            usdVersionUrl: 21-02
+            pythonVersion: 3.6
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: 'ON'
+    runs-on: ubuntu-18.04
+    name: 'Ubuntu 18.04 NVIDIA Pre-built Binaries
+      <USD Version=${{ matrix.usdVersion }},
+       Python Version=${{ matrix.pythonVersion }},
+       Build type:${{ matrix.buildType }},
+       Enable tests=${{ matrix.build-tests }}>'
+    steps:
+      - name: Install dependencies (Linux)
+        run: sudo apt-get install cmake python${{ matrix.pythonVersion }} python${{ matrix.pythonVersion }}-dev
+      - uses: actions/checkout@v2
+      - name: Download and extract pre-built USD binaries
+        run: |
+          curl -L -o /tmp/usd-${{ matrix.usdVersion }}.tar.gz https://developer.nvidia.com/usd-${{ matrix.usdVersionUrl }}-binary-linux-python-${{ matrix.pythonVersion }}
+          mkdir -p /tmp/usd-${{ matrix.usdVersion }}
+          tar -C /tmp/usd-${{ matrix.usdVersion }} -xvf /tmp/usd-${{ matrix.usdVersion }}.tar.gz
+      - name: Create build directories
+        run: |
+          mkdir _build
+          mkdir _install
+      - name: Configure
+        run: |
+          cmake -DUSD_ROOT="/tmp/usd-${{ matrix.usdVersion }}/" \
+                -DTBB_ROOT="/tmp/usd-${{ matrix.usdVersion }}/" \
+                -DBOOST_ROOT="/tmp/usd-${{ matrix.usdVersion }}/" \
+                -DUSE_PYTHON_3=${{ matrix.USE_PYTHON_3 }} \
+                -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} \
+                -DBUILD_TESTING=${{ matrix.buildTests }} \
+                -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" \
+                -DCMAKE_INSTALL_PREFIX=../_install \
+                ..
+        working-directory: _build
+      - name: Build
+        run: |
+          cmake --build . \
+                --verbose \
+                --target install \
+                --config ${{ matrix.buildType }}
+        working-directory: _build
+      - name: Test
+        run: ctest -VV --output-on-failure -C ${{ matrix.buildType }}
+        working-directory: _build
+
   # ASWF docker images based build
   aswf-build:
     strategy:
