@@ -15,6 +15,7 @@ usd_library(usdTri
         gf
         usd
         usdGeom
+        arch
 
     PUBLIC_CLASSES
         triangle

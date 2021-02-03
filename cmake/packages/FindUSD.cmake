@@ -8,6 +8,11 @@ message(STATUS ${USD_ROOT})
 
 set(PXR_LIB_PREFIX "lib")
 
+if (MSVC)
+    # MSVC does not use prefixes for libs
+    set(PXR_LIB_PREFIX "")
+endif()
+
 find_path(USD_INCLUDE_DIR pxr/pxr.h
           PATHS ${USD_ROOT}/include
                 $ENV{USD_ROOT}/include

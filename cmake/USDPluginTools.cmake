@@ -14,7 +14,16 @@ set(USD_PLUG_INFO_RESOURCES_DIR "resources")
 set(USD_PLUG_INFO_ROOT_DIR "usd")
 
 # Paths set on the PXR_PLUGIN_PATH env var when running tests.
-set(_TEST_PXR_PLUGIN_PATH "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}:${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}:$ENV{PXR_PLUGINPATH_NAME}")
+set(_TEST_PXR_PLUGIN_PATH 
+    "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}"
+    "${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}"
+    "$ENV{PXR_PLUGINPATH_NAME}")
+
+if (MSVC)
+    list(JOIN _TEST_PXR_PLUGIN_PATH "\\;" _TEST_PXR_PLUGIN_PATH)
+else()
+    list(JOIN _TEST_PXR_PLUGIN_PATH ":" _TEST_PXR_PLUGIN_PATH)
+endif()
 
 #
 # Public entry point for building a C++ based USD shared library.
@@ -295,11 +304,36 @@ function(usd_python_test TEST_TARGET PYTHON_FILE)
 
     # Set-up runtime environment variables for the test.
     # The paths refer to the build tree (which mirrors the final installation).
+    # The first path for an env var needs the 'VARNAME=' prepended.
+    # Env vars after the first must be prepended with a double escaped semicolon to be recognized. 
+
+    # TEST_PYTHON_PATH
+    set(TEST_PYTHON_PATH "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python")
+    string(PREPEND TEST_PYTHON_PATH "PYTHONPATH=")
+    list(APPEND TEST_PYTHON_PATH 
+        "${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python"
+        "$ENV{PYTHONPATH}")
+
+    # PXR_PLUGINPATH_NAME
+    set(TEST_PLUGINPATH_NAME "${_TEST_PXR_PLUGIN_PATH}")
+    string(PREPEND TEST_PLUGINPATH_NAME "PXR_PLUGINPATH_NAME=")
+    string(PREPEND TEST_PLUGINPATH_NAME "\\;")
+
+    # Aggregate all the paths lists together.
+    list(APPEND TEST_PYTHON_PATH "${TEST_PLUGINPATH_NAME}")
+
+    if (MSVC)
+        list(JOIN TEST_PYTHON_PATH "\\;" ENV_PATHS)
+    else()
+        list(JOIN TEST_PYTHON_PATH ":" ENV_PATHS)
+    endif()
+
     set_tests_properties(${TEST_TARGET}
         PROPERTIES
             ENVIRONMENT
-            "PYTHONPATH=${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python:${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python:$ENV{PYTHONPATH};PXR_PLUGINPATH_NAME=${_TEST_PXR_PLUGIN_PATH}"
+            "${ENV_PATHS}"
     )
+
 endfunction()
 
 #
@@ -439,6 +473,7 @@ function(_usd_cpp_library NAME)
             TARGETS ${NAME}
             EXPORT ${CMAKE_PROJECT_NAME}-targets
             LIBRARY DESTINATION ${LIBRARY_INSTALL_PREFIX}
+            RUNTIME DESTINATION ${LIBRARY_INSTALL_PREFIX}
         )
     endif()
 
@@ -732,14 +767,25 @@ function(_usd_target_properties
         ${ARGN}
     )
 
+    # Add additional platform-speific compile definitions
+    set (platform_definitions)
+    if (MSVC)
+        # Depending on which parts of USD the project uses, additional definitions for windows may need
+        # to be added. A explicit list of MSVC definitions USD builds with can be found in the USD source at:
+        #   cmake/defaults/CXXDefaults.cmake
+        #   cmake/defaults/msvcdefaults.cmake
+        list(APPEND platform_definitions NOMINMAX)
+    endif()
+
     target_compile_definitions(${TARGET_NAME}
         PRIVATE
             ${args_DEFINES}
+            ${platform_definitions}
     )
 
     target_compile_features(${TARGET_NAME}
         PRIVATE
-            cxx_std_11
+            cxx_std_14
     )
 
     # Exported include paths for this target.

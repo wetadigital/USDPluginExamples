@@ -55,6 +55,22 @@ cmake \
 cmake --build  . -- VERBOSE=1 -j8 all test install
 ```
 
+Example snippet for generating a Visual Studio project on Windows:
+```cmd
+mkdir build
+cd build
+cmake ^
+    .. ^
+    -G "Visual Studio 15 2017 Win64" ^
+    -DCMAKE_INSTALL_PREFIX=D:\usd\USDPluginExamples\ ^
+    -DUSE_PYTHON_3=ON ^
+    -DBUILD_TESTING=ON ^
+    -DUSD_ROOT="D:\usd\builds\v20.11" ^
+    -DTBB_ROOT="D:\usd\builds\v20.11" ^
+    -DBOOST_ROOT="D:\usd\builds\v20.11"
+```
+
+
 CMake options for configuring this project:
 
 | CMake Variable name     | Description                                                            | Default |
@@ -72,12 +88,22 @@ To register the plugin(s) as part of the USD runtime, the following environment 
 to be defined:
 | Environment Variable  | Value(s)                                                                                 |
 | --------------------- | ---------------------------------------------------------------------------------------- |
-| `LD_LIBRARY_PATH`     | `${USDPLUGINEXAMPLES_INSTALL_ROOT}/lib`                                                  |
 | `PYTHONPATH`          | `${USDPLUGINEXAMPLES_INSTALL_ROOT}/lib/python`                                           |
 | `PXR_PLUGINPATH_NAME` | `${USDPLUGINEXAMPLES_INSTALL_ROOT}/lib/usd`<br/>`${USDPLUGINEXAMPLES_INSTALL_ROOT}/plugin/usd` |
 
+Additionally, Windows requires:
+| Environment Variable  | Value(s)                                                                                 |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| `PATH`                | `${USDPLUGINEXAMPLES_INSTALL_ROOT}/lib`                                                  |
+
+Additionally, Linux requires:
+| Environment Variable  | Value(s)                                                                                 |
+| --------------------- | ---------------------------------------------------------------------------------------- |
+| `LD_LIBRARY_PATH`     | `${USDPLUGINEXAMPLES_INSTALL_ROOT}/lib`                                                  |
+
 <sub>Note: libraries and plugins are installed into different locations - thus PXR_PLUGINPATH_NAME specifies
 two separate values.</sub>
+
 
 Once the environment variables have been set-up, an example scene in this repo can be previewed with **usdview**:
 ```
