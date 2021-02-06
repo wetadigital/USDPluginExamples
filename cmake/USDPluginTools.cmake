@@ -13,18 +13,6 @@ set(USD_PYTHON_DIR "python")
 set(USD_PLUG_INFO_RESOURCES_DIR "resources")
 set(USD_PLUG_INFO_ROOT_DIR "usd")
 
-# Paths set on the PXR_PLUGIN_PATH env var when running tests.
-set(_TEST_PXR_PLUGIN_PATH 
-    "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}"
-    "${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}"
-    "$ENV{PXR_PLUGINPATH_NAME}")
-
-if (MSVC)
-    list(JOIN _TEST_PXR_PLUGIN_PATH "\\;" _TEST_PXR_PLUGIN_PATH)
-else()
-    list(JOIN _TEST_PXR_PLUGIN_PATH ":" _TEST_PXR_PLUGIN_PATH)
-endif()
-
 #
 # Public entry point for building a C++ based USD shared library.
 #
@@ -274,12 +262,8 @@ function(usd_test TEST_TARGET)
     )
 
     # Set-up runtime environment variables for the test.
-    # The paths refer to the build tree (which mirrors the final installation).
-    set_tests_properties(${TEST_TARGET}
-        PROPERTIES
-            ENVIRONMENT
-            "PXR_PLUGINPATH_NAME=${_TEST_PXR_PLUGIN_PATH};ARCH_AVOID_JIT=1"
-    )
+    _usd_set_test_properties(${TEST_TARGET} OFF)
+
 endfunction()
 
 # Adds a USD-based python test which is executed by CTest.
@@ -303,36 +287,7 @@ function(usd_python_test TEST_TARGET PYTHON_FILE)
     )
 
     # Set-up runtime environment variables for the test.
-    # The paths refer to the build tree (which mirrors the final installation).
-    # The first path for an env var needs the 'VARNAME=' prepended.
-    # Env vars after the first must be prepended with a double escaped semicolon to be recognized. 
-
-    # TEST_PYTHON_PATH
-    set(TEST_PYTHON_PATH "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python")
-    string(PREPEND TEST_PYTHON_PATH "PYTHONPATH=")
-    list(APPEND TEST_PYTHON_PATH 
-        "${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python"
-        "$ENV{PYTHONPATH}")
-
-    # PXR_PLUGINPATH_NAME
-    set(TEST_PLUGINPATH_NAME "${_TEST_PXR_PLUGIN_PATH}")
-    string(PREPEND TEST_PLUGINPATH_NAME "PXR_PLUGINPATH_NAME=")
-    string(PREPEND TEST_PLUGINPATH_NAME "\\;")
-
-    # Aggregate all the paths lists together.
-    list(APPEND TEST_PYTHON_PATH "${TEST_PLUGINPATH_NAME}")
-
-    if (MSVC)
-        list(JOIN TEST_PYTHON_PATH "\\;" ENV_PATHS)
-    else()
-        list(JOIN TEST_PYTHON_PATH ":" ENV_PATHS)
-    endif()
-
-    set_tests_properties(${TEST_TARGET}
-        PROPERTIES
-            ENVIRONMENT
-            "${ENV_PATHS}"
-    )
+    _usd_set_test_properties(${TEST_TARGET} ON)
 
 endfunction()
 
@@ -479,21 +434,11 @@ function(_usd_cpp_library NAME)
 
     # Mirror installation structure in PROJECT_BINARY_DIR - for running tests against.
     if (BUILD_TESTING)
-        if (args_TYPE STREQUAL "PLUGIN")
-            # Building a plugin, does not need versioning info.
-            add_custom_command(
-                TARGET ${NAME}
-                POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/${LIBRARY_INSTALL_PREFIX}/$<TARGET_FILE_NAME:${NAME}>
-            )
-        else()
-            # Building a library.  Create namelink symlink.
-            add_custom_command(
-                TARGET ${NAME}
-                POST_BUILD
-                    COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/${LIBRARY_INSTALL_PREFIX}/$<TARGET_LINKER_FILE_NAME:${NAME}>
-            )
-        endif()
+        add_custom_command(
+            TARGET ${NAME}
+            POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E create_symlink $<TARGET_FILE:${NAME}> ${PROJECT_BINARY_DIR}/${LIBRARY_INSTALL_PREFIX}/$<TARGET_FILE_NAME:${NAME}>
+        )
     endif()
 
     # Update the target properties.
@@ -560,10 +505,18 @@ function(_usd_python_module NAME)
         )
 
         # Lose the library prefix.
-        set_target_properties(${PYLIB_NAME}
-            PROPERTIES
-                PREFIX ""
-        )
+        if (MSVC)
+            set_target_properties(${PYLIB_NAME}
+                PROPERTIES
+                    PREFIX ""
+                    SUFFIX ".pyd"
+            )
+        else()
+            set_target_properties(${PYLIB_NAME}
+                PROPERTIES
+                    PREFIX ""
+            )
+        endif()
 
         # Apply common compilation properties, and include path properties.
         _usd_target_properties(${PYLIB_NAME}
@@ -830,3 +783,73 @@ function(_usd_target_properties
             ${_LINK_LIBRARIES}
     )
 endfunction() # _usd_target_properties
+
+# Set-up runtime environment variables for the test.
+# When USE_PYTHONPATH is one, will include project python libraries
+function(_usd_set_test_properties
+    TARGET_NAME
+    USE_PYTHONPATH
+)
+    # The paths refer to the build tree (which mirrors the final installation).
+    # The first path for an env var needs the 'VARNAME=' prepended.
+    # On windows, calls to "$ENV{}" must be sanitized to replace back slashes with forward slashes
+    # Env vars after the first must be prepended with a double escaped semicolon to be recognized. 
+
+    set(TEST_ENV_VARS "")
+
+    # Building the PXR_PLUGINPATH_NAME environment variable
+    set(TEST_PXR_PLUGINPATH_NAME "$ENV{PXR_PLUGINPATH_NAME}")
+    if (MSVC)
+        string(REGEX REPLACE "\\\\" "/" TEST_PXR_PLUGINPATH_NAME "${TEST_PXR_PLUGINPATH_NAME}")
+    endif()
+    string(PREPEND TEST_PXR_PLUGINPATH_NAME "PXR_PLUGINPATH_NAME=")
+    list(APPEND TEST_PXR_PLUGINPATH_NAME
+        "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/${USD_PLUG_INFO_ROOT_DIR}"
+        "${PROJECT_BINARY_DIR}/${USD_PLUGIN_DIR}/${USD_PLUG_INFO_ROOT_DIR}"
+    )
+    list(APPEND TEST_ENV_VARS "${TEST_PXR_PLUGINPATH_NAME}")
+
+    # Building the PYTHONPATH  environment variable
+    if (USE_PYTHONPATH)
+        set(TEST_PYTHON_PATH "$ENV{PYTHONPATH}")
+        if (MSVC)
+            string(REGEX REPLACE "\\\\" "/" TEST_PYTHON_PATH "${TEST_PYTHON_PATH}")
+        endif()
+        string(PREPEND TEST_PYTHON_PATH "PYTHONPATH=")
+        string(PREPEND TEST_PYTHON_PATH "\\;")
+        list(APPEND TEST_PYTHON_PATH 
+            "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}/python"
+            "${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}/python"
+        )
+
+        list(APPEND TEST_ENV_VARS "${TEST_PYTHON_PATH}")
+    endif()
+
+    # Add MSVC-required paths
+    if (MSVC)
+        # Building the PATH  environment variable
+        set(TEST_PATH "$ENV{PATH}")
+        string(REGEX REPLACE "\\\\" "/" TEST_PATH "${TEST_PATH}")
+        string(PREPEND TEST_PATH "PATH=")
+        string(PREPEND TEST_PATH "\\;")
+        list(APPEND TEST_PATH 
+            "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+        )
+
+        list(APPEND TEST_ENV_VARS "${TEST_PATH}")
+    endif()
+
+
+    if (MSVC)
+        list(JOIN TEST_ENV_VARS "\\;" TEST_ENV_VARS)
+    else()
+        list(JOIN TEST_ENV_VARS ":" TEST_ENV_VARS)
+    endif()
+
+    set_tests_properties(${TARGET_NAME}
+        PROPERTIES
+            ENVIRONMENT
+            "${TEST_ENV_VARS}"
+    )
+
+endfunction() # _usd_set_test_properties

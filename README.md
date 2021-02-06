@@ -55,7 +55,7 @@ cmake \
 cmake --build  . -- VERBOSE=1 -j8 all test install
 ```
 
-Example snippet for generating a Visual Studio project on Windows:
+Example snippet for building a Visual Studio project on Windows:
 ```cmd
 mkdir build
 cd build
@@ -68,6 +68,8 @@ cmake ^
     -DUSD_ROOT="D:\usd\builds\v20.11" ^
     -DTBB_ROOT="D:\usd\builds\v20.11" ^
     -DBOOST_ROOT="D:\usd\builds\v20.11"
+
+cmake --build . --config Release -j 8 --target ALL_BUILD RUN_TESTS INSTALL
 ```
 
 
