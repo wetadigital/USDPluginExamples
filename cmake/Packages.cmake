@@ -4,11 +4,11 @@
 if (ENABLE_PYTHON_SUPPORT)
     # Find python libraries.
     if (USE_PYTHON_3)
-        find_package(PythonLibs 3.0 REQUIRED)
         find_package(PythonInterp 3.0 REQUIRED)
+        find_package(PythonLibs 3.0 REQUIRED)
     else()
-        find_package(PythonLibs 2.7 REQUIRED)
         find_package(PythonInterp 2.7 REQUIRED)
+        find_package(PythonLibs 2.7 REQUIRED)
     endif()
 
     # Pick up boost version variables.
