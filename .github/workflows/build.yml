@@ -88,6 +88,88 @@ jobs:
         run: ctest -VV --output-on-failure -C ${{ matrix.buildType }}
         working-directory: _build
 
+
+# A build job matrix based on pre-built USD binaries provided by NVIDIA on Windows.
+  nvidia-usd-binaries-windows-build:
+    strategy:
+      matrix:
+        usdVersion:
+          - 20.08
+          - 20.11
+          - 21.02
+        include:
+          - usdVersion: 20.08
+            usdVersionUrl: 20.08
+            pythonVersion: 3.6
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: ON
+          - usdVersion: 20.11
+            usdVersionUrl: 20-11
+            pythonVersion: 3.6
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: ON
+          - usdVersion: 21.02
+            usdVersionUrl: 21-02
+            pythonVersion: 3.6
+            USE_PYTHON_3: ON
+            buildType: Release
+            buildTests: ON
+    runs-on: windows-2016
+    name: 'Windows 2016 NVIDIA Pre-built Binaries
+      <USD Version=${{ matrix.usdVersion }},
+       Python Version=${{ matrix.pythonVersion }},
+       Build type:${{ matrix.buildType }},
+       Enable tests=${{ matrix.build-tests }}>'
+    steps:
+      - uses: actions/checkout@v2
+      - name: Set up Python ${{ matrix.pythonVersion }}
+        uses: actions/setup-python@v2
+        with:
+          python-version: ${{ matrix.pythonVersion }}
+      - name: Download and extract pre-built USD binaries
+        run: |
+          Invoke-WebRequest https://developer.nvidia.com/usd-${{ matrix.usdVersionUrl }}-binary-windows-python-${{ matrix.pythonVersion }} -OutFile $env:TEMP/usd-${{ matrix.usdVersion }}.zip
+          mkdir -Force $env:TEMP/usd-${{ matrix.usdVersion }}
+          7z x $env:TEMP/usd-${{ matrix.usdVersion }}.zip $("-o" + "$env:TEMP" + "\usd-${{ matrix.usdVersion }}") -y
+      - name: Create build directories
+        run: |
+          mkdir -Force _build
+          mkdir -Force _install
+      - name: Configure
+        run: |
+          cmake -DUSD_ROOT="$env:TEMP/usd-${{ matrix.usdVersion }}" `
+              -DTBB_ROOT="$env:TEMP/usd-${{ matrix.usdVersion }}" `
+              -DBOOST_ROOT="$env:TEMP/usd-${{ matrix.usdVersion }}" `
+              -DUSE_PYTHON_3=${{ matrix.USE_PYTHON_3 }} `
+              -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} `
+              -DBUILD_TESTING=${{ matrix.buildTests }} `
+              -DCMAKE_INSTALL_PREFIX="../_install" `
+              -G "Visual Studio 15 2017 Win64" `
+              ..
+        working-directory: "_build"
+      - name: Build
+        run: |
+          cmake --build . `
+            --verbose `
+            --config ${{ matrix.buildType }} `
+            --target ALL_BUILD
+        working-directory: "_build"
+      - name: Run Tests
+        run: |
+          ctest --extra-verbose `
+            --output-on-failure `
+            -C ${{ matrix.buildType }}
+        working-directory: "_build"
+      - name: Install
+        run: |
+          cmake --build . `
+            --verbose `
+            --config ${{ matrix.buildType }} `
+            --target INSTALL
+        working-directory: "_build"
+
   # ASWF docker images based build
   aswf-build:
     strategy:
