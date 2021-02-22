@@ -834,6 +834,8 @@ function(_usd_set_test_properties
         string(PREPEND TEST_PATH "\\;")
         list(APPEND TEST_PATH 
             "${PROJECT_BINARY_DIR}/${CMAKE_INSTALL_LIBDIR}"
+            "${USD_ROOT}/${CMAKE_INSTALL_LIBDIR}"
+            "${USD_ROOT}/${CMAKE_INSTALL_BINDIR}"
         )
 
         list(APPEND TEST_ENV_VARS "${TEST_PATH}")
