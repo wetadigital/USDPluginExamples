@@ -14,7 +14,8 @@
                         "bases": [
                             "UsdGeomGprim"
                         ], 
-                        "implementsComputeExtent": true
+                        "implementsComputeExtent": true, 
+                        "schemaKind": "concreteTyped"
                     }
                 }
             }, 

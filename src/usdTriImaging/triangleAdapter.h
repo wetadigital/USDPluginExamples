@@ -39,15 +39,6 @@ public:
         const UsdImagingInstancerContext* i_instancerContext =
             nullptr) const override;
 
-#if PXR_VERSION < 2011
-    virtual void UpdateForTime(const UsdPrim& usdPrim,
-                               const SdfPath& cachePath,
-                               UsdTimeCode timeCode,
-                               HdDirtyBits i_requestedBits,
-                               const UsdImagingInstancerContext*
-                                   instancerContext = nullptr) const override;
-#endif
-
     // ---------------------------------------------------------------------- //
     /// \name Change processing
     // ---------------------------------------------------------------------- //
@@ -64,21 +55,13 @@ public:
     /// Override the implementation in GprimAdapter and provide \em custom
     /// points for a triangle.
     virtual VtValue GetPoints(const UsdPrim& usdPrim,
-#if PXR_VERSION < 2011
-                              const SdfPath& cachePath,
-#endif
                               UsdTimeCode timeCode) const override;
 
-#if PXR_VERSION >= 2011
     /// Override the implementation in GprimAdapter and provide \em custom
     /// topology for a triangle.
     virtual VtValue GetTopology(const UsdPrim& usdPrim,
                                 const SdfPath& cachePath,
                                 UsdTimeCode time) const override;
-#else
-private:
-    static VtValue _GetTopology();
-#endif
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE
