@@ -57,33 +57,6 @@ UsdTriImagingTriangleAdapter::TrackVariability(
              HdChangeTracker::StringifyDirtyBits(*o_timeVaryingBits).c_str());
 }
 
-#if PXR_VERSION < 2011
-void
-UsdTriImagingTriangleAdapter::UpdateForTime(
-    const UsdPrim& usdPrim,
-    const SdfPath& cachePath,
-    UsdTimeCode timeCode,
-    HdDirtyBits i_requestedBits,
-    const UsdImagingInstancerContext* instancerContext) const
-{
-    TF_DEBUG(USDTRIIMAGING)
-        .Msg("[%s] <%s>, <%s>, timeCode: %f, dirtyBits: %s\n",
-             TF_FUNC_NAME().c_str(),
-             usdPrim.GetPath().GetText(),
-             cachePath.GetText(),
-             timeCode.GetValue(),
-             HdChangeTracker::StringifyDirtyBits(i_requestedBits).c_str());
-
-    BaseAdapter::UpdateForTime(
-        usdPrim, cachePath, timeCode, i_requestedBits, instancerContext);
-
-    UsdImagingValueCache* valueCache = _GetValueCache();
-    if (i_requestedBits & HdChangeTracker::DirtyTopology) {
-        valueCache->GetTopology(cachePath) = _GetTopology();
-    }
-}
-#endif
-
 SdfPath
 UsdTriImagingTriangleAdapter::Populate(
     const UsdPrim& usdPrim,
@@ -125,9 +98,6 @@ UsdTriImagingTriangleAdapter::ProcessPropertyChange(const UsdPrim& usdPrim,
 
 VtValue
 UsdTriImagingTriangleAdapter::GetPoints(const UsdPrim& usdPrim,
-#if PXR_VERSION < 2011
-                                        const SdfPath& cachePath,
-#endif
                                         UsdTimeCode timeCode) const
 {
     UsdTriTriangle triangle(usdPrim);
@@ -144,15 +114,10 @@ UsdTriImagingTriangleAdapter::GetPoints(const UsdPrim& usdPrim,
     return VtValue(points);
 }
 
-#if PXR_VERSION >= 2011
 VtValue
 UsdTriImagingTriangleAdapter::GetTopology(const UsdPrim& usdPrim,
                                           const SdfPath& cachePath,
                                           UsdTimeCode time) const
-#else
-VtValue
-UsdTriImagingTriangleAdapter::_GetTopology()
-#endif
 {
     // A single triangle.
     VtIntArray faceVertexCounts(1, 3);

@@ -52,7 +52,14 @@ UsdTriTriangle::Define(const UsdStagePtr& stage, const SdfPath& path)
 }
 
 /* virtual */
-UsdSchemaType
+UsdSchemaKind
+UsdTriTriangle::_GetSchemaKind() const
+{
+    return UsdTriTriangle::schemaKind;
+}
+
+/* virtual */
+UsdSchemaKind
 UsdTriTriangle::_GetSchemaType() const
 {
     return UsdTriTriangle::schemaType;

@@ -91,13 +91,7 @@ HdTriRenderDelegate::CommitResources(HdChangeTracker* tracker)
 {}
 
 HdRprim*
-HdTriRenderDelegate::CreateRprim(const TfToken& typeId,
-#if PXR_VERSION >= 2102
-                                 const SdfPath& rprimId)
-#else
-                                 const SdfPath& rprimId,
-                                 const SdfPath& instancerId)
-#endif
+HdTriRenderDelegate::CreateRprim(const TfToken& typeId, const SdfPath& rprimId)
 {
     TF_DEBUG(HDTRI_GENERAL)
         .Msg("[%s] Create HdTri Rprim type %s id %s\n",
@@ -181,12 +175,7 @@ HdTriRenderDelegate::DestroyBprim(HdBprim* bprim)
 
 HdInstancer*
 HdTriRenderDelegate::CreateInstancer(HdSceneDelegate* delegate,
-#if PXR_VERSION >= 2102
                                      const SdfPath& id)
-#else
-                                     const SdfPath& id,
-                                     const SdfPath& instancerId)
-#endif
 {
     TF_CODING_ERROR("Creating Instancer not supported id=%s", id.GetText());
     return nullptr;
@@ -220,11 +209,7 @@ HdTriRenderDelegate::_Setup()
 {
     _renderParam = std::unique_ptr<HdTriRenderParam>(new HdTriRenderParam());
     _resourceRegistry =
-#if PXR_VERSION >= 2002
         std::shared_ptr<HdResourceRegistry>(new HdResourceRegistry());
-#else
-        boost::shared_ptr<HdResourceRegistry>(new HdResourceRegistry());
-#endif
 }
 
 PXR_NAMESPACE_CLOSE_SCOPE
