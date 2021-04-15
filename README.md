@@ -46,9 +46,9 @@ Example snippet for building the plugins on Linux (and potentially MacOS):
 mkdir build
 cd build
 cmake \
-  -DUSD_ROOT="/apps/usd/20.11/" \
-  -DTBB_ROOT="/apps/usd/20.11/" \
-  -DBOOST_ROOT="/apps/usd/20.11/" \
+  -DUSD_ROOT="/apps/usd/21.05/" \
+  -DTBB_ROOT="/apps/usd/21.05/" \
+  -DBOOST_ROOT="/apps/usd/21.05/" \
   -DBUILD_TESTING=ON \
   -DCMAKE_INSTALL_PREFIX="/apps/USDPluginExamples/" \
   ..
@@ -65,9 +65,9 @@ cmake ^
     -DCMAKE_INSTALL_PREFIX=D:\usd\USDPluginExamples\ ^
     -DUSE_PYTHON_3=ON ^
     -DBUILD_TESTING=ON ^
-    -DUSD_ROOT="D:\usd\builds\v20.11" ^
-    -DTBB_ROOT="D:\usd\builds\v20.11" ^
-    -DBOOST_ROOT="D:\usd\builds\v20.11"
+    -DUSD_ROOT="D:\usd\builds\v21.05" ^
+    -DTBB_ROOT="D:\usd\builds\v21.05" ^
+    -DBOOST_ROOT="D:\usd\builds\v21.05"
 
 cmake --build . --config Release -j 8 --target ALL_BUILD RUN_TESTS INSTALL
 ```
