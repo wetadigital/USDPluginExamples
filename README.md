@@ -34,7 +34,7 @@ There are many other USD plugins available online - check out [USD Working Group
 The following dependencies are required:
 - C++ compiler
 - [CMake](https://cmake.org/documentation/) (3.13 or greater)
-- [USD](https://github.com/pixaranimationstudios/USD) (21.05)
+- [USD](https://github.com/pixaranimationstudios/USD) (22.05)
 - [Boost](https://boost.org) and [Intel TBB](https://www.threadingbuildingblocks.org/) (USD dependencies)
 
 [Python](https://www.python.org/) may also be required, depending on python support in the USD installation.
@@ -46,9 +46,9 @@ Example snippet for building the plugins on Linux (and potentially MacOS):
 mkdir build
 cd build
 cmake \
-  -DUSD_ROOT="/apps/usd/21.05/" \
-  -DTBB_ROOT="/apps/usd/21.05/" \
-  -DBOOST_ROOT="/apps/usd/21.05/" \
+  -DUSD_ROOT="/apps/usd/22.05/" \
+  -DTBB_ROOT="/apps/usd/22.05/" \
+  -DBOOST_ROOT="/apps/usd/22.05/" \
   -DBUILD_TESTING=ON \
   -DCMAKE_INSTALL_PREFIX="/apps/USDPluginExamples/" \
   ..
@@ -65,9 +65,9 @@ cmake ^
     -DCMAKE_INSTALL_PREFIX=D:\usd\USDPluginExamples\ ^
     -DUSE_PYTHON_3=ON ^
     -DBUILD_TESTING=ON ^
-    -DUSD_ROOT="D:\usd\builds\v21.05" ^
-    -DTBB_ROOT="D:\usd\builds\v21.05" ^
-    -DBOOST_ROOT="D:\usd\builds\v21.05"
+    -DUSD_ROOT="D:\usd\builds\v22.05" ^
+    -DTBB_ROOT="D:\usd\builds\v22.05" ^
+    -DBOOST_ROOT="D:\usd\builds\v22.05"
 
 cmake --build . --config Release -j 8 --target ALL_BUILD RUN_TESTS INSTALL
 ```

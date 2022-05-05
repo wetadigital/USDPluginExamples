@@ -58,13 +58,6 @@ UsdTriTriangle::_GetSchemaKind() const
     return UsdTriTriangle::schemaKind;
 }
 
-/* virtual */
-UsdSchemaKind
-UsdTriTriangle::_GetSchemaType() const
-{
-    return UsdTriTriangle::schemaType;
-}
-
 /* static */
 const TfType&
 UsdTriTriangle::_GetStaticTfType()
