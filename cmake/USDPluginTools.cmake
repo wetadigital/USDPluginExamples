@@ -605,9 +605,15 @@ function(_usd_install_resource_files NAME)
         LIBRARY_FILE_PREFIX
     )
 
+    if (args_TYPE STREQUAL "PLUGIN")
+        set(LIBRARY_FILE_SUFFIX ${CMAKE_SHARED_MODULE_SUFFIX})
+    else()
+        set(LIBRARY_FILE_SUFFIX ${CMAKE_SHARED_LIBRARY_SUFFIX})
+    endif()
+
     # Compose the full name of the library.
     # This will be used when performing variable substition on the plugInfo.json resource file.
-    set(LIBRARY_FILE_NAME ${LIBRARY_FILE_PREFIX}${NAME}${CMAKE_SHARED_LIBRARY_SUFFIX})
+    set(LIBRARY_FILE_NAME ${LIBRARY_FILE_PREFIX}${NAME}${LIBRARY_FILE_SUFFIX})
 
     # Plugin resources will be installed as a 'usd' subdir under the library install location.
     set(RESOURCES_INSTALL_PREFIX ${LIBRARY_INSTALL_PREFIX}/${USD_PLUG_INFO_ROOT_DIR})
