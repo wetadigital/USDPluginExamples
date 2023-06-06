@@ -28,7 +28,7 @@ public:
         HdRenderDelegate* renderDelegate) override;
 
     /// Is this plugin supported?
-    virtual bool IsSupported() const override;
+    virtual bool IsSupported(bool gpuEnabled = true) const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

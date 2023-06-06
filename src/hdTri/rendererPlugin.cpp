@@ -28,7 +28,7 @@ HdTriRendererPlugin::DeleteRenderDelegate(HdRenderDelegate* renderDelegate)
 }
 
 bool
-HdTriRendererPlugin::IsSupported() const
+HdTriRendererPlugin::IsSupported(bool gpuEnabled) const
 {
     return true;
 }
