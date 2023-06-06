@@ -417,11 +417,13 @@ function(_usd_cpp_library NAME)
     else()
         # Setup SOVERSION & VERSION properties to create
         # NAMELINK, SONAME, and actual library with full version suffix.
-        set_target_properties(${NAME}
-            PROPERTIES
-                SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
-                VERSION ${CMAKE_PROJECT_VERSION}
-        )
+        if (!APPLE)
+            set_target_properties(${NAME}
+                PROPERTIES
+                    SOVERSION ${CMAKE_PROJECT_VERSION_MAJOR}
+                    VERSION ${CMAKE_PROJECT_VERSION}
+            )
+        endif()
 
         # Install the library and export it as an public target.
         install(
