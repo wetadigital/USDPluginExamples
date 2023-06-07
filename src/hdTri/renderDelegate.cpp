@@ -132,7 +132,7 @@ HdTriRenderDelegate::CreateFallbackSprim(const TfToken& typeId)
         return new HdCamera(SdfPath::EmptyPath());
     } else {
         TF_CODING_ERROR("Unknown Fallback Sprim type=%s id=%s",
-                        typeId.GetText());
+                        typeId.GetText(), typeId.GetText());
     }
     return nullptr;
 }
