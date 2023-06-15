@@ -20,7 +20,8 @@ class _WrapStaticToken
 public:
     _WrapStaticToken(const TfToken* token)
       : _token(token)
-    {}
+    {
+    }
 
     std::string operator()() const { return _token->GetString(); }
 

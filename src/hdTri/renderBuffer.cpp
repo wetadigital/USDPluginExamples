@@ -10,7 +10,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 HdTriRenderBuffer::HdTriRenderBuffer(const SdfPath& bprimId)
   : HdRenderBuffer(bprimId)
-{}
+{
+}
 
 bool
 HdTriRenderBuffer::Allocate(const GfVec3i& dimensions,

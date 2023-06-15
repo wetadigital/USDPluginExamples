@@ -16,7 +16,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 HdTriRenderPass::HdTriRenderPass(HdRenderIndex* index,
                                  const HdRprimCollection& collection)
   : HdRenderPass(index, collection)
-{}
+{
+}
 
 HdTriRenderPass::~HdTriRenderPass() {}
 

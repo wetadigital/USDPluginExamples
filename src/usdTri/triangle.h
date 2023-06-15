@@ -51,14 +51,16 @@ public:
     /// an invalid \p prim
     explicit UsdTriTriangle(const UsdPrim& prim = UsdPrim())
       : UsdGeomGprim(prim)
-    {}
+    {
+    }
 
     /// Construct a UsdTriTriangle on the prim held by \p schemaObj .
     /// Should be preferred over UsdTriTriangle(schemaObj.GetPrim()),
     /// as it preserves SchemaBase state.
     explicit UsdTriTriangle(const UsdSchemaBase& schemaObj)
       : UsdGeomGprim(schemaObj)
-    {}
+    {
+    }
 
     /// Destructor.
     USDTRI_API

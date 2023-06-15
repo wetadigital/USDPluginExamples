@@ -84,7 +84,8 @@ UsdTriangleFileFormat::UsdTriangleFileFormat()
                   UsdTriangleFileFormatTokens->Version,
                   UsdTriangleFileFormatTokens->Target,
                   UsdTriangleFileFormatTokens->Extension)
-{}
+{
+}
 
 UsdTriangleFileFormat::~UsdTriangleFileFormat() {}
 
