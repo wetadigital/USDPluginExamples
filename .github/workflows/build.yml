@@ -148,7 +148,7 @@ jobs:
     steps:
       - name: Install dependencies (Linux)
         run: |
-          sudo apt-get install clang-format-10
+          sudo apt-get install clang-format-13
       - uses: actions/checkout@v2
       - name: Run clang-format on source code
         run: |
