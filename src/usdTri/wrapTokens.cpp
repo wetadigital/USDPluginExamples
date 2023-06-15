@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -20,7 +20,8 @@ class _WrapStaticToken
 public:
     _WrapStaticToken(const TfToken* token)
       : _token(token)
-    {}
+    {
+    }
 
     std::string operator()() const { return _token->GetString(); }
 
@@ -49,4 +50,5 @@ wrapUsdTriTokens()
         "Tokens", boost::python::no_init);
     _AddToken(cls, "extent", UsdTriTokens->extent);
     _AddToken(cls, "sideLength", UsdTriTokens->sideLength);
+    _AddToken(cls, "Triangle", UsdTriTokens->Triangle);
 }

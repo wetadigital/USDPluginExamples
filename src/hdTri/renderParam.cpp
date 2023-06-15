@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -9,6 +9,7 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 HdTriRenderParam::HdTriRenderParam()
   : HdRenderParam()
-{}
+{
+}
 
 PXR_NAMESPACE_CLOSE_SCOPE

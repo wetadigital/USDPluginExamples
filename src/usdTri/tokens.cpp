@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -10,8 +10,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 UsdTriTokensType::UsdTriTokensType()
   : extent("extent", TfToken::Immortal)
   , sideLength("sideLength", TfToken::Immortal)
-  , allTokens({ extent, sideLength })
-{}
+  , Triangle("Triangle", TfToken::Immortal)
+  , allTokens({ extent, sideLength, Triangle })
+{
+}
 
 TfStaticData<UsdTriTokensType> UsdTriTokens;
 

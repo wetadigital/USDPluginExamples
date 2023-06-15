@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -16,7 +16,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 HdTriRenderPass::HdTriRenderPass(HdRenderIndex* index,
                                  const HdRprimCollection& collection)
   : HdRenderPass(index, collection)
-{}
+{
+}
 
 HdTriRenderPass::~HdTriRenderPass() {}
 

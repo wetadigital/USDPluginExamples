@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -28,7 +28,7 @@ public:
         HdRenderDelegate* renderDelegate) override;
 
     /// Is this plugin supported?
-    virtual bool IsSupported() const override;
+    virtual bool IsSupported(bool gpuEnabled = true) const override;
 };
 
 PXR_NAMESPACE_CLOSE_SCOPE

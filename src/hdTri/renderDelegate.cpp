@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -88,7 +88,8 @@ HdTriRenderDelegate::CreateRenderPass(HdRenderIndex* index,
 
 void
 HdTriRenderDelegate::CommitResources(HdChangeTracker* tracker)
-{}
+{
+}
 
 HdRprim*
 HdTriRenderDelegate::CreateRprim(const TfToken& typeId, const SdfPath& rprimId)
@@ -132,7 +133,8 @@ HdTriRenderDelegate::CreateFallbackSprim(const TfToken& typeId)
         return new HdCamera(SdfPath::EmptyPath());
     } else {
         TF_CODING_ERROR("Unknown Fallback Sprim type=%s id=%s",
-                        typeId.GetText(), typeId.GetText());
+                        typeId.GetText(),
+                        typeId.GetText());
     }
     return nullptr;
 }

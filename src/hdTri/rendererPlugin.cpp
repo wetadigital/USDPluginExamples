@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -28,7 +28,7 @@ HdTriRendererPlugin::DeleteRenderDelegate(HdRenderDelegate* renderDelegate)
 }
 
 bool
-HdTriRendererPlugin::IsSupported() const
+HdTriRendererPlugin::IsSupported(bool gpuEnabled) const
 {
     return true;
 }

@@ -1,5 +1,5 @@
 //
-// Copyright © 2021 Weta Digital Limited
+// Copyright © 2023 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //
@@ -10,7 +10,8 @@ PXR_NAMESPACE_OPEN_SCOPE
 
 HdTriRenderBuffer::HdTriRenderBuffer(const SdfPath& bprimId)
   : HdRenderBuffer(bprimId)
-{}
+{
+}
 
 bool
 HdTriRenderBuffer::Allocate(const GfVec3i& dimensions,
