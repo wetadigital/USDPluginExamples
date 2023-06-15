@@ -52,6 +52,10 @@ struct UsdTriTokensType
     ///
     /// UsdTriTriangle
     const TfToken sideLength;
+    /// \brief "Triangle"
+    ///
+    /// Schema identifer and family for UsdTriTriangle
+    const TfToken Triangle;
     /// A vector of all of the tokens listed above.
     const std::vector<TfToken> allTokens;
 };

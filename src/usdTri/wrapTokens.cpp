@@ -49,4 +49,5 @@ wrapUsdTriTokens()
         "Tokens", boost::python::no_init);
     _AddToken(cls, "extent", UsdTriTokens->extent);
     _AddToken(cls, "sideLength", UsdTriTokens->sideLength);
+    _AddToken(cls, "Triangle", UsdTriTokens->Triangle);
 }

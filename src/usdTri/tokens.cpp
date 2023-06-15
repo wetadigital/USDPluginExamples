@@ -10,8 +10,10 @@ PXR_NAMESPACE_OPEN_SCOPE
 UsdTriTokensType::UsdTriTokensType()
   : extent("extent", TfToken::Immortal)
   , sideLength("sideLength", TfToken::Immortal)
-  , allTokens({ extent, sideLength })
-{}
+  , Triangle("Triangle", TfToken::Immortal)
+  , allTokens({ extent, sideLength, Triangle })
+{
+}
 
 TfStaticData<UsdTriTokensType> UsdTriTokens;
 
