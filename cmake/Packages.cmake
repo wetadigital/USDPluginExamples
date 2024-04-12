@@ -1,15 +1,26 @@
 # Discovery of the dependencies of USDPluginExamples.
 
+if (USD_ROOT)
+
+    if (NOT BOOST_ROOT)
+        message(STATUS "BOOST_ROOT not set, defaulting to ${USD_ROOT}")
+        set(BOOST_ROOT ${USD_ROOT})
+    endif()
+
+    if (NOT TBB_ROOT)
+        message(STATUS "TBB_ROOT not set, defaulting to ${USD_ROOT}")
+        set(TBB_ROOT ${USD_ROOT})
+    endif()
+
+else()
+    message(FATAL_ERROR "USD_ROOT must be set to the root dir of the USD installation!")
+endif()
+
 # Boost & python.
 if (ENABLE_PYTHON_SUPPORT)
     # Find python libraries.
-    if (USE_PYTHON_3)
-        find_package(PythonInterp 3.0 REQUIRED)
-        find_package(PythonLibs 3.0 REQUIRED)
-    else()
-        find_package(PythonInterp 2.7 REQUIRED)
-        find_package(PythonLibs 2.7 REQUIRED)
-    endif()
+    find_package(PythonInterp 3.0 REQUIRED)
+    find_package(PythonLibs 3.0 REQUIRED)
 
     # Pick up boost version variables.
     find_package(Boost REQUIRED)
