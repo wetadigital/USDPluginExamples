@@ -255,6 +255,13 @@ function(usd_test TEST_TARGET)
             ${args_LIBRARIES}
     )
 
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_link_options(${TEST_TARGET}
+            PRIVATE
+                "-Wl,--no-as-needed"
+        )
+    endif()
+
     # Add the test target.
     add_test(
         NAME ${TEST_TARGET}

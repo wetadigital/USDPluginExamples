@@ -11,5 +11,6 @@ usd_test(usdTri_testTriangle
         tf
         sdf
         usd
+        usdGeom
         usdTri
 )
