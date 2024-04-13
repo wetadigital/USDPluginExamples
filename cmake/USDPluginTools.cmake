@@ -744,7 +744,7 @@ function(_usd_target_properties
 
     target_compile_features(${TARGET_NAME}
         PRIVATE
-            cxx_std_14
+            cxx_std_17
     )
 
     # Exported include paths for this target.
