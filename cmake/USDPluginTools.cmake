@@ -743,6 +743,12 @@ function(_usd_target_properties
         list(APPEND platform_definitions NOMINMAX)
     endif()
 
+    # Some implementations of C++17 removes some deprecated functions from stl
+    # MSVC adds this define by default
+    if (NOT MSVC)
+        list(APPEND platform_definitions BOOST_NO_CXX98_FUNCTION_BASE)
+    endif()
+
     target_compile_definitions(${TARGET_NAME}
         PRIVATE
             ${args_DEFINES}
