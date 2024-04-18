@@ -255,6 +255,13 @@ function(usd_test TEST_TARGET)
             ${args_LIBRARIES}
     )
 
+    if (CMAKE_CXX_COMPILER_ID STREQUAL "GNU")
+        target_link_options(${TEST_TARGET}
+            PRIVATE
+                "-Wl,--no-as-needed"
+        )
+    endif()
+
     # Add the test target.
     add_test(
         NAME ${TEST_TARGET}
@@ -282,7 +289,7 @@ function(usd_python_test TEST_TARGET PYTHON_FILE)
     # Add a new test target.
     add_test(
         NAME ${TEST_TARGET}
-        COMMAND ${PYTHON_EXECUTABLE} ${PYTHON_FILE}
+        COMMAND ${Python3_EXECUTABLE} ${PYTHON_FILE}
         WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
     )
 
@@ -736,6 +743,12 @@ function(_usd_target_properties
         list(APPEND platform_definitions NOMINMAX)
     endif()
 
+    # Some implementations of C++17 removes some deprecated functions from stl
+    # MSVC adds this define by default
+    if (NOT MSVC)
+        list(APPEND platform_definitions BOOST_NO_CXX98_FUNCTION_BASE)
+    endif()
+
     target_compile_definitions(${TARGET_NAME}
         PRIVATE
             ${args_DEFINES}
@@ -744,7 +757,7 @@ function(_usd_target_properties
 
     target_compile_features(${TARGET_NAME}
         PRIVATE
-            cxx_std_14
+            cxx_std_17
     )
 
     # Exported include paths for this target.
@@ -764,7 +777,7 @@ function(_usd_target_properties
     set(_INCLUDE_DIRS "")
     list(APPEND _INCLUDE_DIRS ${args_INCLUDE_DIRS} ${USD_INCLUDE_DIR} ${TBB_INCLUDE_DIRS})
     if (ENABLE_PYTHON_SUPPORT)
-        list(APPEND _INCLUDE_DIRS ${PYTHON_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
+        list(APPEND _INCLUDE_DIRS ${Python3_INCLUDE_DIR} ${Boost_INCLUDE_DIR})
     endif()
     target_include_directories(${TARGET_NAME}
         SYSTEM
@@ -782,7 +795,7 @@ function(_usd_target_properties
     set(_LINK_LIBRARIES "")
     list(APPEND _LINK_LIBRARIES ${args_LIBRARIES} ${TBB_LIBRARIES})
     if (ENABLE_PYTHON_SUPPORT)
-        list(APPEND _LINK_LIBRARIES ${Boost_PYTHON_LIBRARY} ${PYTHON_LIBRARIES})
+        list(APPEND _LINK_LIBRARIES ${Boost_PYTHON_LIBRARY} ${Python3_LIBRARIES})
     endif()
     target_link_libraries(${TARGET_NAME}
         PRIVATE

@@ -1,5 +1,5 @@
 //
-// Copyright © 2023 Weta Digital Limited
+// Copyright © 2024 Weta Digital Limited
 //
 // SPDX-License-Identifier: Apache-2.0
 //

@@ -34,7 +34,7 @@ There are many other USD plugins available online - check out [USD Working Group
 The following dependencies are required:
 - C++ compiler
 - [CMake](https://cmake.org/documentation/) (3.13 or greater)
-- [USD](https://github.com/pixaranimationstudios/USD) (23.05)
+- [USD](https://github.com/pixaranimationstudios/USD) (24.03)
 - [Boost](https://boost.org) and [Intel TBB](https://www.threadingbuildingblocks.org/) (USD dependencies)
 
 [Python](https://www.python.org/) may also be required, depending on python support in the USD installation.
@@ -46,10 +46,7 @@ Example snippet for building the plugins on Linux (and potentially MacOS):
 mkdir build
 cd build
 cmake \
-  -DUSD_ROOT="/apps/usd/23.05/" \
-  -DTBB_ROOT="/apps/usd/23.05/" \
-  -DBOOST_ROOT="/apps/usd/23.05/" \
-  -DBUILD_TESTING=ON \
+  -DUSD_ROOT="/apps/usd/" \
   -DCMAKE_INSTALL_PREFIX="/apps/USDPluginExamples/" \
   ..
 cmake --build  . -- VERBOSE=1 -j8 all test install
@@ -60,14 +57,10 @@ Example snippet for building a Visual Studio project on Windows:
 mkdir build
 cd build
 cmake ^
-    .. ^
     -G "Visual Studio 15 2017 Win64" ^
-    -DCMAKE_INSTALL_PREFIX=D:\usd\USDPluginExamples\ ^
-    -DUSE_PYTHON_3=ON ^
-    -DBUILD_TESTING=ON ^
-    -DUSD_ROOT="D:\usd\builds\v23.05" ^
-    -DTBB_ROOT="D:\usd\builds\v23.05" ^
-    -DBOOST_ROOT="D:\usd\builds\v23.05"
+    -DUSD_ROOT="D:\install\usd" ^
+    -DCMAKE_INSTALL_PREFIX="D:\install\USDPluginExamples\" ^
+    ..
 
 cmake --build . --config Release -j 8 --target ALL_BUILD RUN_TESTS INSTALL
 ```
@@ -81,8 +74,7 @@ CMake options for configuring this project:
 | `TBB_ROOT`              | Root directory of Intel TBB installation                               |         |
 | `BOOST_ROOT`            | Root directory of Boost installation                                   |         |
 | `ENABLE_PYTHON_SUPPORT` | Enable python support.  Must match python support of USD installation. | `ON`    |
-| `USE_PYTHON_3`          | Build against Python 3 libraries.                                      | `OFF`   |
-| `BUILD_TESTING`         | Enable automated testing.                                              | `OFF`   |
+| `BUILD_TESTING`         | Enable automated testing.                                              | `ON`    |
 
 ## Running
 

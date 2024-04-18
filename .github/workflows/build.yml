@@ -29,7 +29,6 @@ jobs:
 #         - usdVersion: 21.05
 #           usdVersionUrl: 21-05
 #           pythonVersion: 3.6
-#           USE_PYTHON_3: ON
 #           buildType: Release
 #           buildTests: 'ON'
 #   runs-on: ubuntu-18.04
@@ -54,9 +53,6 @@ jobs:
 #     - name: Configure
 #       run: |
 #         cmake -DUSD_ROOT="/tmp/usd-${{ matrix.usdVersion }}/" \
-#               -DTBB_ROOT="/tmp/usd-${{ matrix.usdVersion }}/" \
-#               -DBOOST_ROOT="/tmp/usd-${{ matrix.usdVersion }}/" \
-#               -DUSE_PYTHON_3=${{ matrix.USE_PYTHON_3 }} \
 #               -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} \
 #               -DBUILD_TESTING=${{ matrix.buildTests }} \
 #               -DCMAKE_CXX_FLAGS="-D_GLIBCXX_USE_CXX11_ABI=0" \
@@ -85,7 +81,6 @@ jobs:
 #         - usdVersion: 21.05
 #           usdVersionUrl: 21-05
 #           pythonVersion: 3.6
-#           USE_PYTHON_3: ON
 #           buildType: Release
 #           buildTests: ON
 #   runs-on: windows-2016
@@ -112,9 +107,6 @@ jobs:
 #     - name: Configure
 #       run: |
 #         cmake -DUSD_ROOT="$env:TEMP/usd-${{ matrix.usdVersion }}" `
-#             -DTBB_ROOT="$env:TEMP/usd-${{ matrix.usdVersion }}" `
-#             -DBOOST_ROOT="$env:TEMP/usd-${{ matrix.usdVersion }}" `
-#             -DUSE_PYTHON_3=${{ matrix.USE_PYTHON_3 }} `
 #             -DCMAKE_BUILD_TYPE=${{ matrix.buildType }} `
 #             -DBUILD_TESTING=${{ matrix.buildTests }} `
 #             -DCMAKE_INSTALL_PREFIX="../_install" `

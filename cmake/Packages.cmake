@@ -1,15 +1,30 @@
 # Discovery of the dependencies of USDPluginExamples.
 
+if (USD_ROOT)
+
+    if (NOT BOOST_ROOT)
+        message(STATUS "BOOST_ROOT not set, defaulting to ${USD_ROOT}")
+        set(BOOST_ROOT ${USD_ROOT})
+    endif()
+
+    if (NOT TBB_ROOT)
+        message(STATUS "TBB_ROOT not set, defaulting to ${USD_ROOT}")
+        set(TBB_ROOT ${USD_ROOT})
+    endif()
+
+else()
+    message(FATAL_ERROR "USD_ROOT must be set to the root dir of the USD installation!")
+endif()
+
 # Boost & python.
 if (ENABLE_PYTHON_SUPPORT)
     # Find python libraries.
-    if (USE_PYTHON_3)
-        find_package(PythonInterp 3.0 REQUIRED)
-        find_package(PythonLibs 3.0 REQUIRED)
-    else()
-        find_package(PythonInterp 2.7 REQUIRED)
-        find_package(PythonLibs 2.7 REQUIRED)
-    endif()
+    find_package(
+        Python3
+        COMPONENTS
+            Interpreter Development
+        REQUIRED
+    )
 
     # Pick up boost version variables.
     find_package(Boost REQUIRED)
@@ -28,7 +43,7 @@ if (ENABLE_PYTHON_SUPPORT)
     if (${boost_version_string} VERSION_GREATER_EQUAL "1.67")
         # In boost-1.67 and greater, the boost python component includes the
         # python major and minor version as part of its name.
-        set(PYTHON_VERSION_DOTLESS "${PYTHON_VERSION_MAJOR}${PYTHON_VERSION_MINOR}")
+        set(PYTHON_VERSION_DOTLESS "${Python3_VERSION_MAJOR}${Python3_VERSION_MINOR}")
         find_package(Boost
             COMPONENTS
                 python${PYTHON_VERSION_DOTLESS}
