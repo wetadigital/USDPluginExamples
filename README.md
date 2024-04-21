@@ -33,8 +33,8 @@ There are many other USD plugins available online - check out [USD Working Group
 
 The following dependencies are required:
 - C++ compiler
-- [CMake](https://cmake.org/documentation/) (3.13 or greater)
-- [USD](https://github.com/pixaranimationstudios/USD) (24.03)
+- [CMake](https://cmake.org/documentation/) (Tested with CMake 3.29.2)
+- [USD](https://github.com/pixaranimationstudios/USD) (24.05)
 - [Boost](https://boost.org) and [Intel TBB](https://www.threadingbuildingblocks.org/) (USD dependencies)
 
 [Python](https://www.python.org/) may also be required, depending on python support in the USD installation.
@@ -52,7 +52,7 @@ cmake \
 cmake --build  . -- VERBOSE=1 -j8 all test install
 ```
 
-Example snippet for building a Visual Studio project on Windows:
+Example snippet for building a Visual Studio project on Windows (x64 Native Tools Command Prompt with Administrator privileges):
 ```cmd
 mkdir build
 cd build
