@@ -5,17 +5,22 @@ set(ORGANIZATION "usdpluginexamples")
 
 # Build & install libraries.
 add_subdirectory(usdTri)
+add_subdirectory(usdEpiphyte)
 add_subdirectory(usdviewTri)
 
 # Build & install plugins.
 if (BUILD_HYDRA2)
     add_subdirectory(usdTriImagingHd2)
-else()
+    add_subdirectory(usdEpiphyteImaging)
+    add_subdirectory(hdEpiphyte)
+    else()
     add_subdirectory(usdTriImaging)
 endif()
 
+add_subdirectory(usdTriImaging)
 add_subdirectory(usdTriFileFormat)
 add_subdirectory(hdTri)
+
 
 # Install top-level plugInfo for including per-library plugInfo(s).
 install(

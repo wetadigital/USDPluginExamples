@@ -28,7 +28,21 @@ Huge thanks to Pixar's USD team for providing a highly extensible platform!
 - [hdTri](./src/hdTri): A hydra renderer plugin which images a triangle (in the most direct sense).
 - [usdviewTri](./src/usdviewTri): An usdview plugin providing a menu command to define child Triangle prim(s) under selected paths.
 
+
 [*] We deliberatly split the Hydra 1 & 2 Triangle Prim Adapters into two plugins/sources to outline the differences
+
+
+### USD In Production Examples
+
+The example code presented as part of the USD in Production talk at [SIGGRAPH 2024](https://s2024.conference-program.org/presentation/?id=gensub_436&sess=sess163). These examples use Hydra 2 exclusively.
+Disable these examples using `-DBUILD_SIGG2024=off`
+
+- [usdEpiphyte](./src/usdEpiphyte): a API Schema adapter to describe a relationship between a child primitive and its parent-primitive and the location (pointId) on it
+- [usdEpiphyteImaging](./src/usdEpiphyteImaging): a API Schema adapter for the API Schema
+- [hdEpiphyte](./src/hdEpiphyte): a Hydra Schema & Scene Index Filter
+
+
+
 
 There are many other USD plugins available online - check out [USD Working Group: Projects & Resources](https://wiki.aswf.io/display/WGUSD/USD+Projects+and+Resources) for more!
 
@@ -79,6 +93,7 @@ CMake options for configuring this project:
 | `ENABLE_PYTHON_SUPPORT` | Enable python support.  Must match python support of USD installation. | `ON`    |
 | `BUILD_TESTING`         | Enable automated testing.                                              | `ON`    |
 | `BUILD_HYDRA2`          | Enable building Hydra2 plugins, will disable Hydra1 plugin building.   | `OFF`   |
+| `BUILD_SIGG2024`          | Enable building SIGGRAPH 2024 USD In Production Course Examples.   | `ON`   |
 
 ## Running
 
