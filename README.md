@@ -4,9 +4,9 @@
 
 A collection of example plugins for [Pixar's USD](https://github.com/PixarAnimationStudios/USD) (Universal Scene Description).
 
-This project also aims to provide a set of CMake utilities for building USD plugins outside of the USD project source tree.  The utilities are heavily based on the build logic prescribed by the USD project itself. 
+This project also aims to provide a set of CMake utilities for building USD plugins outside of the USD project source tree.  The utilities are heavily based on the build logic prescribed by the USD project itself.
 
-We hope the minimal examples and surrounding build infrastructure can be useful to USD community developers interested in building and deploying their own plugin(s).  
+We hope the minimal examples and surrounding build infrastructure can be useful to USD community developers interested in building and deploying their own plugin(s).
 
 Huge thanks to Pixar's USD team for providing a highly extensible platform!
 
@@ -22,10 +22,13 @@ Huge thanks to Pixar's USD team for providing a highly extensible platform!
 
 **USDPluginExamples** provides the following USD plugins:
 - [usdTri](./src/usdTri): A schema library defining a **Triangle** prim type.
-- [usdTriImaging](./src/usdTriImaging): A prim adapter which images the **Triangle** prim type.
+- [usdTriImaging](./src/usdTriImaging): A *Hydra 1 only* prim adapter which images the **Triangle** prim type. [*]
+- [usdTriImagingHd2](./src/usdTriImagingHd2): A *Hydra 2 only* prim adapter which images the **Triangle** prim type. [*]
 - [usdTriFileFormat](./src/usdTriFileFormat): A file format plugin which authors a triangular mesh for a `.triangle` payload.
 - [hdTri](./src/hdTri): A hydra renderer plugin which images a triangle (in the most direct sense).
 - [usdviewTri](./src/usdviewTri): An usdview plugin providing a menu command to define child Triangle prim(s) under selected paths.
+
+[*] We deliberatly split the Hydra 1 & 2 Triangle Prim Adapters into two plugins/sources to outline the differences
 
 There are many other USD plugins available online - check out [USD Working Group: Projects & Resources](https://wiki.aswf.io/display/WGUSD/USD+Projects+and+Resources) for more!
 
@@ -75,6 +78,7 @@ CMake options for configuring this project:
 | `BOOST_ROOT`            | Root directory of Boost installation                                   |         |
 | `ENABLE_PYTHON_SUPPORT` | Enable python support.  Must match python support of USD installation. | `ON`    |
 | `BUILD_TESTING`         | Enable automated testing.                                              | `ON`    |
+| `BUILD_HYDRA2`          | Enable building Hydra2 plugins, will disable Hydra1 plugin building.   | `OFF`   |
 
 ## Running
 
@@ -97,6 +101,11 @@ Additionally, Linux requires:
 
 <sub>Note: libraries and plugins are installed into different locations - thus PXR_PLUGINPATH_NAME specifies
 two separate values.</sub>
+
+To run the Hydra2 Prim Adapter with Storm/GL you have to enable the SceneIndex for UsdImagingGL
+| Environment Variable                     | Value(s)                                                              |
+| ---------------------------------------- | --------------------------------------------------------------------- |
+| `USDIMAGINGGL_ENGINE_ENABLE_SCENE_INDEX` | `1``````````````````                                                  |
 
 
 Once the environment variables have been set-up, an example scene in this repo can be previewed with **usdview**:

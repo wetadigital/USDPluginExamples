@@ -8,7 +8,12 @@ add_subdirectory(usdTri)
 add_subdirectory(usdviewTri)
 
 # Build & install plugins.
-add_subdirectory(usdTriImaging)
+if (BUILD_HYDRA2)
+    add_subdirectory(usdTriImagingHd2)
+else()
+    add_subdirectory(usdTriImaging)
+endif()
+
 add_subdirectory(usdTriFileFormat)
 add_subdirectory(hdTri)
 
