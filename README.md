@@ -26,6 +26,7 @@ Huge thanks to Pixar's USD team for providing a highly extensible platform!
 - [usdTriImagingHd2](./src/usdTriImagingHd2): A *Hydra 2 only* prim adapter which images the **Triangle** prim type. [*]
 - [usdTriFileFormat](./src/usdTriFileFormat): A file format plugin which authors a triangular mesh for a `.triangle` payload.
 - [hdTri](./src/hdTri): A hydra renderer plugin which images a triangle (in the most direct sense).
+- [hdGpTri](./src/hdGpTri): A generative procedural plugin which creates a triangle (in the most direct sense).
 - [usdviewTri](./src/usdviewTri): An usdview plugin providing a menu command to define child Triangle prim(s) under selected paths.
 
 [*] We deliberatly split the Hydra 1 & 2 Triangle Prim Adapters into two plugins/sources to outline the differences

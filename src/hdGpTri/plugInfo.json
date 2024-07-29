@@ -1,0 +1,22 @@
+{
+    "Plugins": [
+        {
+            "Info": {
+                "Types": {
+                    "TriProceduralPlugin": {
+                        "bases": [
+                            "HdGpGenerativeProceduralPlugin"
+                        ],
+                        "displayName": "triangle",
+                        "priority" : 0
+                    }
+                }
+            },
+            "LibraryPath": "../../hdGpTri.so",
+            "Name": "hdGpTri",
+            "ResourcePath": "resources",
+            "Root": "..",
+            "Type": "library"
+        }
+    ]
+}

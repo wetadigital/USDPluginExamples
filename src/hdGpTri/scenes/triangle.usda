@@ -1,0 +1,28 @@
+#usda 1.0
+
+
+def Scope "World"
+{
+    def GenerativeProcedural "myGenerativeProc" (
+        prepend apiSchemas = ["HydraGenerativeProceduralAPI"]
+    )
+    {
+        token primvars:hdGp:proceduralType = "triangle"
+        double primvars:sideLength = 1.0
+    }
+
+    def Xform "transformed"
+    {
+        matrix4d xformOp:transform:transform1 = ( (1, 0, 0, 0), (0, 1, 0, 0), (0, 0, 1, 0), (-4, 4, 0, 1) )
+        uniform token[] xformOpOrder = ["xformOp:transform:transform1"]
+
+        def GenerativeProcedural "myGenerativeProcTransformed" (
+            prepend apiSchemas = ["HydraGenerativeProceduralAPI"]
+        )
+        {
+            token primvars:hdGp:proceduralType = "triangle"
+            double primvars:sideLength = 1.0
+
+        }
+    }
+}
